@@ -3,21 +3,35 @@ const twentyFourHours = 24 * 60 * 60000
 
 function add_url_to_storage(url, proposedTime) {
     chrome.storage.local.get(url).then((result) => {
-        var storedTime=result[url]
+        var storedTime = result[url]
         if (storedTime == undefined) {
-            //if (!storedTime || storedTime == 'null' || storedTime == 'undefined') {
-            chrome.storage.local.set({ url: proposedTime }).then(
-                () => { console.log("added to the best o my ability") });
-            storedTime = proposedTime
+            var urlTime = {};
+            urlTime[url] = new Date(proposedTime).toString()
+            return chrome.storage.local.set(urlTime).then(
+                () => {
+                    return proposedTime
+                });
         };
         return storedTime
-    }).then((storedTime) => {
-        document.querySelector('#add-timer-btn').remove()
-        document.querySelector('#popup-text').innerHTML = "Added to timer!";
-        const countdownElementId = "countdown-timer";
+    }).then((timeForCountdown) => {
+        document.getElementById('add-timer-btn').remove()
+        document.getElementById('popup-text').innerHTML = "Added to timer!";
 
-        createCountdownTimer(new Date(storedTime), countdownElementId);
-    })
+ 
+
+
+
+        const countdownElementId = "countdown-timer";
+        createCountdownTimer(new Date(timeForCountdown), countdownElementId);
+
+        const resetTimerBtnId = "reset-timer-btn";
+        var resetTimerBtnElem = document.getElementById(resetTimerBtnId);
+        resetTimerBtnElem.classList.remove('btn-hidden');
+        resetTimerBtnElem.classList.add('btn-visible');
+
+    }).catch((error) => {
+        console.error('Failed to add URL to storage or create countdown:', error);
+    });
 }
 
 
