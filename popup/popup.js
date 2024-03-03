@@ -1,7 +1,7 @@
 
-const twentyFourHours = 24 * 60 * 60000
-
-function add_url_to_storage(url, proposedTime) {
+const twentyFourHours = 24 * 60 * 60000;
+var intervalId;
+function handleCountDown(url, proposedTime) {
     chrome.storage.local.get(url).then((result) => {
         var storedTime = result[url]
         if (storedTime == undefined) {
@@ -14,10 +14,9 @@ function add_url_to_storage(url, proposedTime) {
         };
         return storedTime
     }).then((timeForCountdown) => {
-        document.getElementById('add-timer-btn').remove()
-        document.getElementById('popup-text').innerHTML = "Added to timer!";
+        document.querySelector('#add-timer-btn').classList.add("btn-hidden");
 
- 
+        document.getElementById('popup-text').innerHTML = "Added to timer!";
 
 
 
@@ -26,8 +25,11 @@ function add_url_to_storage(url, proposedTime) {
 
         const resetTimerBtnId = "reset-timer-btn";
         var resetTimerBtnElem = document.getElementById(resetTimerBtnId);
-        resetTimerBtnElem.classList.remove('btn-hidden');
-        resetTimerBtnElem.classList.add('btn-visible');
+        try {
+            resetTimerBtnElem.classList.remove('btn-hidden');
+        } finally {
+            resetTimerBtnElem.classList.add('btn-visible');
+        }
 
     }).catch((error) => {
         console.error('Failed to add URL to storage or create countdown:', error);
@@ -80,19 +82,34 @@ function createCountdownTimer(targetDate, elementId) {
     };
 
     // Start the countdown timer with an interval of 1 second
-    const intervalId = setInterval(updateTimer, 1000);
+    intervalId = setInterval(updateTimer, 1000);
 }
 
 
+function getPageUrl(tabs) {
+    if (tabs && tabs.length > 0) {
+        const url = tabs[0].url;
+        return url
+        //console.log(url);
+    } else {
+        console.error("Failed to get the current tab's URL.");
+    }
+}
 document.querySelector('#add-timer-btn').addEventListener("click", () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        if (tabs && tabs.length > 0) {
-            const url = tabs[0].url;
+    chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+        var url = getPageUrl(tabs);
+        let currentTime = new Date(Date.now() + twentyFourHours);
+        handleCountDown(url, currentTime)
+
+    });
+})
+document.querySelector('#reset-timer-btn').addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+        var url = getPageUrl(tabs);
+        chrome.storage.local.remove(url).then(() => {
             let currentTime = new Date(Date.now() + twentyFourHours);
-            add_url_to_storage(url, currentTime)
-            console.log(url);
-        } else {
-            console.error("Failed to get the current tab's URL.");
-        }
+            clearInterval(intervalId);
+            handleCountDown(url, currentTime);
+        })
     });
 })

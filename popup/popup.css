@@ -1,15 +1,23 @@
-body{
+body {
     width: 200px;
 }
-.text-center{
+
+.text-center {
     text-align: center;
 }
-.countdown{
+
+.countdown {
     font-size: 30px;
 }
-.btn-hidden{
+
+.btn-hidden {
     visibility: hidden;
 }
-.btn-visible{
-    visibility:visible;
+
+.btn-visible {
+    visibility: visible;
+}
+
+.center {
+    margin: auto;
 }
