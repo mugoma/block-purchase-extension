@@ -2,7 +2,7 @@
 chrome.action.onClicked.addListener((tab) => {
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
-    files: ['scripts/content.js']
+    files: ['content.js']
   });
 });
 // const ebay_site = 'https://ebay.com/itm/'
