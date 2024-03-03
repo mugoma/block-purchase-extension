@@ -16,6 +16,14 @@ function countdown(time){
     //TODO: Add countdown
 }
 document.querySelector('#add-timer-btn').addEventListener("click", () => {
-    var url = window.location.toString()
-    add_url_to_storage(url)
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs && tabs.length > 0) {
+          const url = tabs[0].url;
+          // Do something with the URL, like displaying it or sending it elsewhere
+          add_url_to_storage(url)
+          console.log(url);
+        } else {
+          console.error("Failed to get the current tab's URL.");
+        }
+      });
 })
