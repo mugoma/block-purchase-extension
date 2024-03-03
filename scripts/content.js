@@ -1,4 +1,5 @@
-alert('Hello, world!');
+// console.log("i might be trying")
+// alert('Hello, world!');
 
 // // Create a timer element
 // const timerDiv = document.createElement('div');

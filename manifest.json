@@ -16,7 +16,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://ebay.com/*"
+        "*://ebay.com/itm/*",
+        "*://*.ebay.com/itm/*"
       ],
       "js": [
         "scripts/content.js"
