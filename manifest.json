@@ -1,9 +1,26 @@
 {
-    "manifest_version": 3,
-    "name": "Block Purchase",
-    "description": "Block the immediate purchase of products",
-    "version": "1.0",
-    "action": {
-      "default_popup": "index.html"
+  "manifest_version": 3,
+  "name": "Block Purchase",
+  "description": "Block the immediate purchase of products",
+  "version": "1.0",
+  "action": {
+    "default_popup": "index.html"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "scripts/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ebay.com/*"
+      ],
+      "js": [
+        "scripts/content.js"
+      ]
     }
-  }
+  ]
+}
