@@ -2,17 +2,21 @@
 const twentyFourHours = 24 * 60 * 60000
 
 function add_url_to_storage(url, proposedTime) {
-    chrome.storage.local.get(url).then((storedTime) => {
-        if (!(storedTime && storedTime !== 'null' && storedTime !== 'undefined')) {
-            chrome.storage.local.set({ url: proposedTime }).then(() => { console.log("added to the best o my ability") });
+    chrome.storage.local.get(url).then((result) => {
+        var storedTime=result[url]
+        if (storedTime == undefined) {
+            //if (!storedTime || storedTime == 'null' || storedTime == 'undefined') {
+            chrome.storage.local.set({ url: proposedTime }).then(
+                () => { console.log("added to the best o my ability") });
             storedTime = proposedTime
         };
-        console.log("this is the value" + storedTime.toString());
+        return storedTime
+    }).then((storedTime) => {
         document.querySelector('#add-timer-btn').remove()
         document.querySelector('#popup-text').innerHTML = "Added to timer!";
         const countdownElementId = "countdown-timer";
 
-        createCountdownTimer(storedTime, countdownElementId);
+        createCountdownTimer(new Date(storedTime), countdownElementId);
     })
 }
 
