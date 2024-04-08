@@ -11,13 +11,30 @@ body {
 }
 
 .btn-hidden {
-    visibility: hidden;
+    display: none;
 }
 
 .btn-visible {
-    visibility: visible;
+    display: initial;
 }
 
 .center {
     margin: auto;
+}
+.body-container{
+    height:200px;
+    width: 200px;
+}
+.btn{
+    padding:10px;
+    background-color: brown;
+    color: white;
+    font-size: large;
+    border: none;
+    border-radius: 10px;
+}
+#popup-text{
+    font-size: medium;
+    padding-top: 10px;
+    text-align: center;
 }
