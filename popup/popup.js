@@ -18,7 +18,7 @@ function handleCountDown(url, proposedTime) {
         };
         return storedTime
     }).then((timeForCountdown) => {
-        document.getElementById(ADD_TIMER_BTN_ID).classList.add("btn-hidden");
+        document.getElementById(ADD_TIMER_BTN_ID).classList.add("cls-hidden");
 
         document.getElementById('popup-text').innerHTML = "Added to timer!";
 
@@ -26,7 +26,7 @@ function handleCountDown(url, proposedTime) {
 
         var resetTimerBtnElem = document.getElementById(RESET_TIMER_BTN_ID);
         try {
-            resetTimerBtnElem.classList.remove('btn-hidden');
+            resetTimerBtnElem.classList.remove('cls-hidden');
         } finally {
         }
     }).catch((error) => {

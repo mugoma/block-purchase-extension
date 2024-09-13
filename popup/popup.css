@@ -10,7 +10,7 @@ body {
     font-size: 30px;
 }
 
-.btn-hidden {
+.cls-hidden {
     display: none;
 }
 
@@ -39,5 +39,4 @@ body {
 #popup-text {
     font-size: medium;
     padding-top: 10px;
-    text-align: center;
 }
