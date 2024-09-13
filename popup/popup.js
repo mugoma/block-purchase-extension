@@ -7,6 +7,7 @@ const EXISTING_TIMER_CONTAINER_ID = "existing-timer-container";
 const ADD_TIMER_BTN_ID = "add-timer-btn";
 const ADD_TIMER_CONTAINER_ID = "add-timer-container";
 const CSS_HIDDEN_CLASS = "cls-hidden";
+const DELETE_TIMER_LINK_ID = "delete-timer-link";
 
 function handleCountDown(url, proposedTime) {
     chrome.storage.local.get(url).then((result) => {
@@ -21,7 +22,7 @@ function handleCountDown(url, proposedTime) {
         };
         return storedTime
     }).then((timeForCountdown) => {
-        document.getElementById('popup-text').innerHTML = "Added to timer!";
+        addSuccessMessage()
         updateDOMwithCountDown(timeForCountdown)
     }).catch((error) => {
         console.error('Failed to add URL to storage or create countdown:', error);
@@ -84,15 +85,34 @@ function getCurrentTabUrl(tabs) {
         console.error("Failed to get the current tab's URL.");
     }
 }
-
-function updateDOMwithCountDown(timeForCountdown) {
-    document.getElementById(ADD_TIMER_CONTAINER_ID).classList.add(CSS_HIDDEN_CLASS);
-    createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID);
-    const resetTimerBtnElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID);
-    if (resetTimerBtnElem !== null) {
-        resetTimerBtnElem.classList.remove(CSS_HIDDEN_CLASS);
+function addSuccessMessage() {
+    var successTextElem = document.createElement("p");
+    var successText = document.createTextNode("Added to timer!");
+    successTextElem.appendChild(successText);
+    const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
+    existingTimerContainerElem.insertBefore(successTextElem, existingTimerContainerElem.firstChild)
+}
+function toggleElementVisibility(isVisible, elem) {
+    if (elem !== null) {
+        if (isVisible === true) {
+            elem.classList.remove(CSS_HIDDEN_CLASS)
+        } else {
+            elem.classList.add(CSS_HIDDEN_CLASS)
+        }
     }
-
+}
+function toggleAddTimerContainerVisibility(isVisible) {
+    const addTimerContainerElem = document.getElementById(ADD_TIMER_CONTAINER_ID)
+    toggleElementVisibility(isVisible, addTimerContainerElem)
+}
+function toggleExistingTimerContainerVisibility(isVisible) {
+    const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
+    toggleElementVisibility(isVisible, existingTimerContainerElem)
+}
+function updateDOMwithCountDown(timeForCountdown) {
+    toggleAddTimerContainerVisibility(false)
+    createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID);
+    toggleExistingTimerContainerVisibility(true);
 }
 
 function checkForExistingTimer() {
@@ -101,10 +121,7 @@ function checkForExistingTimer() {
         chrome.storage.local.get(url).then((result) => {
             var storedTime = result[url]
             if (storedTime == undefined) {
-                const addTimerBtnElem = document.getElementById(ADD_TIMER_CONTAINER_ID)
-                if (addTimerBtnElem !== null) {
-                    addTimerBtnElem.classList.remove(CSS_HIDDEN_CLASS)
-                }
+                toggleAddTimerContainerVisibility(true)
             } else {
                 updateDOMwithCountDown(storedTime)
             }
@@ -115,7 +132,7 @@ checkForExistingTimer();
 
 document.getElementById(ADD_TIMER_BTN_ID).addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        var url = getCurrentTabUrl(tabs);
+        const url = getCurrentTabUrl(tabs);
         let currentTime = new Date(Date.now() + twentyFourHours);
         handleCountDown(url, currentTime)
 
@@ -124,11 +141,21 @@ document.getElementById(ADD_TIMER_BTN_ID).addEventListener("click", () => {
 
 document.getElementById(RESET_TIMER_BTN_ID).addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        var url = getCurrentTabUrl(tabs);
+        const url = getCurrentTabUrl(tabs);
         chrome.storage.local.remove(url).then(() => {
             let currentTime = new Date(Date.now() + twentyFourHours);
             clearInterval(intervalId);
             handleCountDown(url, currentTime);
         })
     });
+})
+document.getElementById(DELETE_TIMER_LINK_ID).addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+        var url = getCurrentTabUrl(tabs);
+        chrome.storage.local.remove(url).then(() => {
+            clearInterval(intervalId);
+            toggleAddTimerContainerVisibility(true);
+            toggleExistingTimerContainerVisibility(false);
+        })
+    })
 })
