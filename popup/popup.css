@@ -21,19 +21,22 @@ body {
 .center {
     margin: auto;
 }
-.body-container{
-    height:200px;
+
+.body-container {
+    height: 200px;
     width: 200px;
 }
-.btn{
-    padding:10px;
+
+.btn {
+    padding: 10px;
     background-color: brown;
     color: white;
     font-size: large;
     border: none;
     border-radius: 10px;
 }
-#popup-text{
+
+#popup-text {
     font-size: medium;
     padding-top: 10px;
     text-align: center;

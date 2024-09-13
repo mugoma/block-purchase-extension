@@ -1,6 +1,10 @@
 
 const twentyFourHours = 24 * 60 * 60000;
 var intervalId;
+const COUNTDOWN_ELEMENT_ID = "countdown-timer";
+const RESET_TIMER_BTN_ID = "reset-timer-btn";
+const ADD_TIMER_BTN_ID = "add-timer-btn";
+
 function handleCountDown(url, proposedTime) {
     chrome.storage.local.get(url).then((result) => {
         var storedTime = result[url]
@@ -14,28 +18,21 @@ function handleCountDown(url, proposedTime) {
         };
         return storedTime
     }).then((timeForCountdown) => {
-        document.querySelector('#add-timer-btn').classList.add("btn-hidden");
+        document.getElementById(ADD_TIMER_BTN_ID).classList.add("btn-hidden");
 
         document.getElementById('popup-text').innerHTML = "Added to timer!";
 
+        createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID);
 
-
-        const countdownElementId = "countdown-timer";
-        createCountdownTimer(new Date(timeForCountdown), countdownElementId);
-
-        const resetTimerBtnId = "reset-timer-btn";
-        var resetTimerBtnElem = document.getElementById(resetTimerBtnId);
+        var resetTimerBtnElem = document.getElementById(RESET_TIMER_BTN_ID);
         try {
             resetTimerBtnElem.classList.remove('btn-hidden');
         } finally {
-            resetTimerBtnElem.classList.add('btn-visible');
         }
-
     }).catch((error) => {
         console.error('Failed to add URL to storage or create countdown:', error);
     });
 }
-
 
 function createCountdownTimer(targetDate, elementId) {
     // Get the target date and time in milliseconds
@@ -85,17 +82,16 @@ function createCountdownTimer(targetDate, elementId) {
     intervalId = setInterval(updateTimer, 1000);
 }
 
-
 function getPageUrl(tabs) {
     if (tabs && tabs.length > 0) {
         const url = tabs[0].url;
         return url
-        //console.log(url);
     } else {
         console.error("Failed to get the current tab's URL.");
     }
 }
-document.querySelector('#add-timer-btn').addEventListener("click", () => {
+
+document.getElementById(ADD_TIMER_BTN_ID).addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         var url = getPageUrl(tabs);
         let currentTime = new Date(Date.now() + twentyFourHours);
@@ -103,7 +99,8 @@ document.querySelector('#add-timer-btn').addEventListener("click", () => {
 
     });
 })
-document.querySelector('#reset-timer-btn').addEventListener("click", () => {
+
+document.getElementById(RESET_TIMER_BTN_ID).addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         var url = getPageUrl(tabs);
         chrome.storage.local.remove(url).then(() => {
