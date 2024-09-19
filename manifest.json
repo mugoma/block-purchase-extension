@@ -14,5 +14,17 @@
   ],
   "background": {
     "service_worker": "scripts/background.js"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.amazon.com/*"
+      ],
+      "js": [
+        "scripts/utils.js",
+        "scripts/amazon.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": []
 }
