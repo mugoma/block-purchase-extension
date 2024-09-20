@@ -175,3 +175,16 @@ function toggleExistingTimerContainerVisibility(isVisible) {
 function getCurrentURL() {
     return window.location.href
 }
+function greyOutBuyButtons(elemIds = [], endTime, cssClassesToRemove = []) {
+    elemIds.forEach(elemId => {
+        changeBuyButtonStyling(elemId, endTime, cssClassesToRemove)
+    });
+}
+function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = []) {
+    getStoredTime(getCurrentURL()).then((storedTime) => {
+        if (storedTime !== undefined) {
+            greyOutBuyButtons(buyButtonElemIds, storedTime, cssClassesToRemove)
+            createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', true)
+        }
+    })
+}
