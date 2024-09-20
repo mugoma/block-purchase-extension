@@ -8,9 +8,7 @@ function addExtensionCTA() {
         prevElem.parentNode.insertBefore(createInPageCTAElement(), prevElem.nextSibling);
     }
 }
-function getCurrentURL() {
-    return window.location.href
-}
+
 function addExtensionCTACallback() {
     const ctaBtn = document.getElementById("cs_cta_btn");
     if (ctaBtn !== null) {
@@ -29,13 +27,15 @@ function greyOutBuyButton(endTime) {
     changeBuyButtonStyling(AMZN_ADD_TO_CART_ELEM_ID, endTime, [])
     changeBuyButtonStyling(AMZN_ADD_TO_CART_BNT_ELEM_ID, endTime, [])
 }
-function greyOutBuyButtonIfTimerExists() {
+function updatePageDOMIfTimerExists() {
     getStoredTime(getCurrentURL()).then((storedTime) => {
         if (storedTime !== undefined) {
             greyOutBuyButton(storedTime)
+            createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', true)
         }
     })
 }
+
 addExtensionCTA();
 addExtensionCTACallback();
-greyOutBuyButtonIfTimerExists();
+updatePageDOMIfTimerExists();

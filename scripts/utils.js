@@ -73,7 +73,7 @@ function handleCountDown(url, proposedTime) {
     });
 }
 
-function createCountdownTimer(targetDate, elementId) {
+function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeconds = true) {
     // Get the target date and time in milliseconds
     const targetTime = new Date(targetDate).getTime();
 
@@ -89,7 +89,6 @@ function createCountdownTimer(targetDate, elementId) {
         return;
     }
 
-    const timerPreText = "Time left: "
     // Define an update function to be called every second
     const updateTimer = () => {
         // Calculate the remaining time in seconds
@@ -100,8 +99,10 @@ function createCountdownTimer(targetDate, elementId) {
         const minutes = Math.floor((remainingSeconds % 3600) / 60);
         const seconds = Math.floor(remainingSeconds % 60);
 
+        const secondsString = showSeconds === true ? `:${seconds.toString().padStart(2, "0")}` : '';
+
         // Format the remaining time string with leading zeros for hours and minutes
-        const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+        const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}${secondsString}`;
 
         // Update the element with the formatted time
 
@@ -164,10 +165,13 @@ function checkForExistingTimer() {
 }
 function updateDOMwithCountDown(timeForCountdown) {
     toggleAddTimerContainerVisibility(false)
-    createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID);
+    createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", true);
     toggleExistingTimerContainerVisibility(true);
 }
 function toggleExistingTimerContainerVisibility(isVisible) {
     const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, existingTimerContainerElem)
+}
+function getCurrentURL() {
+    return window.location.href
 }
