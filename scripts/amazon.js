@@ -17,12 +17,17 @@ function addExtensionCTACallback() {
     if (ctaBtn !== null) {
         ctaBtn.addEventListener("click", (e) => {
             e.preventDefault()
-            // Get url to use as key for storage
-            const url = getCurrentURL()
-            chrome.runtime.sendMessage({ action: 'set-timer', url: url }).then((endTime) => {
-                greyOutBuyButtons(AMZN_BUY_BTNS_IDS,endTime,[])
-            })
-
+            const ctaBtnHasTimer = ctaBtn.getAttribute("data-has-timer")
+            if (ctaBtnHasTimer === false) {
+                // Get url to use as key for storage
+                const url = getCurrentURL()
+                chrome.runtime.sendMessage({ action: 'set-timer', url: url }).then((endTime) => {
+                    greyOutBuyButtons(AMZN_BUY_BTNS_IDS, endTime, [])
+                })
+                ctaBtn.setAttribute('data-has-timer', true)
+            } else {
+                //TODO: Add link to 'product' page
+            }
         })
     }
 }
@@ -30,4 +35,4 @@ function addExtensionCTACallback() {
 
 addExtensionCTA();
 addExtensionCTACallback();
-updatePageDOMIfTimerExists(AMZN_BUY_BTNS_IDS,[]);
+updatePageDOMIfTimerExists(AMZN_BUY_BTNS_IDS, []);

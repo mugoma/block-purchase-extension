@@ -21,6 +21,7 @@ function createInPageCTAElement() {
     //const ctaButtonImg = document.createElement("img");
     //ctaButtonImg.setAttribute("src", hourglassImageURL)
     ctaButton.setAttribute("id", CS_CTA_BTN_ID)
+    ctaButton.setAttribute("data-has-timer",false)
 
     //ctaButton.appendChild(ctaButtonImg)
     ctaDiv.appendChild(ctaButton)
@@ -180,11 +181,15 @@ function greyOutBuyButtons(elemIds = [], endTime, cssClassesToRemove = []) {
         changeBuyButtonStyling(elemId, endTime, cssClassesToRemove)
     });
 }
+function startCtaBtnCountdownTimer(storedTime) {
+    createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', true)
+
+}
 function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = []) {
     getStoredTime(getCurrentURL()).then((storedTime) => {
         if (storedTime !== undefined) {
             greyOutBuyButtons(buyButtonElemIds, storedTime, cssClassesToRemove)
-            createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', true)
+            startCtaBtnCountdownTimer(storedTime)
         }
     })
 }
