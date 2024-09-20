@@ -2,38 +2,13 @@ body {
     width: 200px;
 }
 
-.text-center {
-    text-align: center;
-}
-
 .countdown {
     font-size: 30px;
-}
-
-.cls-hidden {
-    display: none;
-}
-
-.btn-visible {
-    display: initial;
-}
-
-.center {
-    margin: auto;
 }
 
 .body-container {
     height: 200px;
     width: 200px;
-}
-
-.btn {
-    padding: 10px;
-    background-color: brown;
-    color: white;
-    font-size: large;
-    border: none;
-    border-radius: 10px;
 }
 
 #popup-text {
