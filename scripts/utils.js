@@ -6,10 +6,11 @@ function createInPageCTAElement() {
     const ctaDiv = document.createElement("div");
     // Button
     const ctaButton = document.createElement("button");
+    ctaButton.classList.add('btn', 'btn-pill', 'background-brown', 'text-white', 'text-center');
+    ctaButton.innerHTML = "Start Timer"
     //Image
     //const ctaButtonImg = document.createElement("img");
     //ctaButtonImg.setAttribute("src", hourglassImageURL)
-    ctaButton.innerHTML = "B"
     ctaButton.setAttribute("id", CS_CTA_BTN_ID)
 
     //ctaButton.appendChild(ctaButtonImg)
@@ -22,7 +23,7 @@ function changeBuyButtonStyling(buyButtonId, endTime, cssClassesToRemove = []) {
     if (buyButtonElem != null) {
         // Make the button gray with white text
         if (cssClassesToRemove.length > 0) {
-            buyButtonElem.classList.remove(cssClassesToRemove);
+            buyButtonElem.classList.remove(...cssClassesToRemove);
         }
         buyButtonElem.classList.add(['dull-buy-btn'])
         // Add tooltip on when timer will end

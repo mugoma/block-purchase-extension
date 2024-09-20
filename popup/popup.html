@@ -1,6 +1,7 @@
 <html>
 
 <head>
+  <link rel="stylesheet" href="../styles/style.css">
   <link rel="stylesheet" href="popup.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap-grid.min.css"
     integrity="sha384-fmZzkB5FaSyz2fHsFdE3/hJZL5DoXoksqtGmj/ceh67vi7uY+MXjBITJATdQsrMM" crossorigin="anonymous">
@@ -12,13 +13,15 @@
     <div id="add-timer-container" class="cls-hidden">
       <p id="popup-text" class="text-center">Do you want to add a timer to the product on this page?</p>
       <div class="d-flex justify-content-center">
-        <button id="add-timer-btn" class="btn">Yes! Add 24 Hour countdown</button>
+        <button id="add-timer-btn" class="btn background-brown text-white btn-large text-center">Yes! Add 24 Hour
+          countdown</button>
       </div>
     </div>
     <div id="existing-timer-container" class="cls-hidden">
       <div id="countdown-timer" class="text-center countdown"></div>
       <div class="d-flex justify-content-center p-3">
-        <button id="reset-timer-btn" class="btn">Restart Timer</button>
+        <button id="reset-timer-btn" class="btn background-brown text-white btn-large text-center">Restart
+          Timer</button>
       </div>
       <div class="text-center">
         <a href="#" id="delete-timer-link">Delete Timer</a>
