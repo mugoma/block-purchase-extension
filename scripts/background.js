@@ -1,3 +1,5 @@
+const twentyFourHours = 24 * 60 * 60000;
+
 const SET_TIMER_ACTION = 'set-timer'
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === SET_TIMER_ACTION) {
@@ -7,13 +9,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             var storedTime = result[url]
             if (storedTime == undefined) {
                 var urlTime = {};
-                urlTime[url] = new Date(proposedTime).toString()
+                var currentTime = new Date(Date.now() + twentyFourHours).toString()
+                urlTime[url] = currentTime
                 return chrome.storage.local.set(urlTime).then(
-                    () => {
-                        return proposedTime
-                    });
+                    () => currentTime);
             };
             return storedTime
-        });
+        }).then((time) => { sendResponse(time) });
     }
 });
