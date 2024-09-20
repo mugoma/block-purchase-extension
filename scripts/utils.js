@@ -17,10 +17,28 @@ function createInPageCTAElement() {
 
     return ctaDiv
 }
+function changeBuyButtonStyling(buyButtonId, endTime, cssClassesToRemove = []) {
+    const buyButtonElem = document.getElementById(buyButtonId);
+    if (buyButtonElem != null) {
+        // Make the button gray with white text
+        if (cssClassesToRemove.length > 0) {
+            buyButtonElem.classList.remove(cssClassesToRemove);
+        }
+        buyButtonElem.classList.add(['dull-buy-btn'])
+        // Add tooltip on when timer will end
+        const titleText = "Timer will end at " + new Date(endTime).toLocaleString()
+        buyButtonElem.setAttribute("title", titleText)
+    }
+}
 
 function setClickEventListenerToElement(element, callback) {
     element.addEventListener("click", () => {
         callback()
     })
+}
+function getStoredTime(url) {
+    return chrome.storage.local.get(url).then((result) => {
+        return result[url]
+    });
 }
 

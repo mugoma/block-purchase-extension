@@ -23,6 +23,9 @@
       "js": [
         "scripts/utils.js",
         "scripts/amazon.js"
+      ],
+      "css": [
+        "styles/style.css"
       ]
     }
   ],

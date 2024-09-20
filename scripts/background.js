@@ -7,9 +7,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             var storedTime = result[url]
             if (storedTime == undefined) {
                 var urlTime = {};
-                urlTime[url] = new Date(Date.now() + (24 * 60 * 60000)).toString()
-                chrome.storage.local.set(urlTime)
+                urlTime[url] = new Date(proposedTime).toString()
+                return chrome.storage.local.set(urlTime).then(
+                    () => {
+                        return proposedTime
+                    });
             };
+            return storedTime
         });
     }
 });
