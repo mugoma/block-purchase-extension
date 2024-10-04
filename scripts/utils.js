@@ -1,4 +1,4 @@
-import { getStoredTime, getOrSetTime,  } from "./utils_chrome_api.js";
+//import { getStoredTime, getOrSetTime,  } from "./utils_chrome_api.js";
 const twentyFourHours = 24 * 60 * 60000;
 
 var intervalId;
@@ -178,4 +178,7 @@ function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = 
             startCtaBtnCountdownTimer(storedTime)
         }
     })
+}
+function removeExistingTimerInterval(){
+    clearInterval(intervalId)
 }

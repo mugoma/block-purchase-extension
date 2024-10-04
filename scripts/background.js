@@ -1,5 +1,4 @@
 import { getOrSetTime, resetTimeInStorage } from "./utils_chrome_api.js";
-const twentyFourHours = 24 * 60 * 60000;
 
 const SET_TIMER_ACTION = 'set-timer';
 const RESET_TIMER_ACTION = 'reset-timer';
@@ -13,8 +12,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     } else if (message.action === RESET_TIMER_ACTION) {
         const url = message.url
-        resetTimeInStorage(url)
-
+        resetTimeInStorage(url).then((time) => { sendResponse(time) });
     }
     else if (message.action === DELETE_TIMER_ACTION) {
         const url = message.url;

@@ -12,7 +12,10 @@ function setTimeInStorage(url, time) {
 
 }
 function resetTimeInStorage(url) {
-    chrome.storage.local.remove(url);
+    return chrome.storage.local.remove(url).then(() => {
+        var currentTime = new Date(Date.now() + twentyFourHours).toString()
+        return setTimeInStorage(url, currentTime)
+    });
 }
 function getOrSetTime(url) {
     return getStoredTime(url).then((storedTime) => {
