@@ -13,7 +13,8 @@
     "tabs"
   ],
   "background": {
-    "service_worker": "scripts/background.js"
+    "service_worker": "dist/scripts/background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -21,8 +22,20 @@
         "https://*.amazon.com/*"
       ],
       "js": [
-        "scripts/utils.js",
-        "scripts/amazon.js"
+        "dist/scripts/utils.js",
+        "dist/scripts/amazon.js"
+      ],
+      "css": [
+        "styles/style.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://*.amazon.com/cart/*"
+      ],
+      "js": [
+        "dist/scripts/utils.js",
+        "dist/scripts/amazon_cart.js"
       ],
       "css": [
         "styles/style.css"

@@ -1,0 +1,42 @@
+.dull-buy-btn {
+    background: #808080 !important;
+    border-color: #808080 !important;
+    color: #ffffff !important;
+}
+
+.btn-pill {
+    border-radius: 10vh;
+}
+
+.cls-hidden {
+    display: none;
+}
+
+.btn-visible {
+    display: initial;
+}
+
+.center {
+    margin: auto;
+}
+
+.background-brown {
+    background-color: brown;
+}
+.text-white{
+    color: white;
+}
+.btn {
+    border: none;
+}
+
+.btn-large {
+    padding: 10px;
+    border-radius: 10px;
+    font-size: large;
+
+}
+
+.text-center {
+    text-align: center;
+}

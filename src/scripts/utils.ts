@@ -1,17 +1,17 @@
-import { getStoredTime, getOrSetTime,  } from "./utils_chrome_api.js";
-const twentyFourHours = 24 * 60 * 60000;
+import { getStoredTime, getOrSetTime, } from "./utils_chrome_api.js";
+export const TWENTY_FOUR_HOURS_IN_MILLISECONDS = 24 * 60 * 60000;
 
-var intervalId;
+var intervalId: number | undefined;
 const COUNTDOWN_ELEMENT_ID = "countdown-timer";
-const RESET_TIMER_BTN_ID = "reset-timer-btn";
+export const RESET_TIMER_BTN_ID = "reset-timer-btn";
 const EXISTING_TIMER_CONTAINER_ID = "existing-timer-container";
-const ADD_TIMER_BTN_ID = "add-timer-btn";
+export const ADD_TIMER_BTN_ID = "add-timer-btn";
 const ADD_TIMER_CONTAINER_ID = "add-timer-container";
 const CSS_HIDDEN_CLASS = "cls-hidden";
-const DELETE_TIMER_LINK_ID = "delete-timer-link";
+export const DELETE_TIMER_LINK_ID = "delete-timer-link";
 const CS_CTA_BTN_ID = "cs_cta_btn"
 
-function createInPageCTAElement() {
+export function createInPageCTAElement() {
     // Div
     const ctaDiv = document.createElement("div");
     // Button
@@ -22,28 +22,28 @@ function createInPageCTAElement() {
     //const ctaButtonImg = document.createElement("img");
     //ctaButtonImg.setAttribute("src", hourglassImageURL)
     ctaButton.setAttribute("id", CS_CTA_BTN_ID)
-    ctaButton.setAttribute("data-has-timer", false)
+    ctaButton.setAttribute("data-has-timer", 'false')
 
     //ctaButton.appendChild(ctaButtonImg)
     ctaDiv.appendChild(ctaButton)
 
     return ctaDiv
 }
-function changeBuyButtonStyling(buyButtonId, endTime, cssClassesToRemove = []) {
+function changeBuyButtonStyling(buyButtonId: string, endTime: string | number | Date, cssClassesToRemove = []) {
     const buyButtonElem = document.getElementById(buyButtonId);
     if (buyButtonElem != null) {
         // Make the button gray with white text
         if (cssClassesToRemove.length > 0) {
             buyButtonElem.classList.remove(...cssClassesToRemove);
         }
-        buyButtonElem.classList.add(['dull-buy-btn'])
+        buyButtonElem.classList.add('dull-buy-btn')
         // Add tooltip on when timer will end
         const titleText = "Timer will end at " + new Date(endTime).toLocaleString()
         buyButtonElem.setAttribute("title", titleText)
     }
 }
 
-function setClickEventListenerToElement(element, callback) {
+export function setClickEventListenerToElement(element: { addEventListener: (arg0: string, arg1: () => void) => void; }, callback: () => void) {
     element.addEventListener("click", () => {
         callback()
     })
@@ -51,16 +51,16 @@ function setClickEventListenerToElement(element, callback) {
 
 
 
-function handleCountDown(url, proposedTime) {
-    getOrSetTime(url).then((timeForCountdown) => {
+export function handleCountDown(url: any, proposedTime: any) {
+    getOrSetTime(url).then((timeForCountdown: any) => {
         addSuccessMessage()
         updateDOMwithCountDown(timeForCountdown)
-    }).catch((error) => {
+    }).catch((error: any) => {
         console.error('Failed to add URL to storage or create countdown:', error);
     });
 }
 
-function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeconds = true) {
+function createCountdownTimer(targetDate: string | number | Date, elementId: string, timerPreText = '', showSeconds = true) {
     // Get the target date and time in milliseconds
     const targetTime = new Date(targetDate).getTime();
 
@@ -72,7 +72,11 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
 
     // Check if the countdown has already ended
     if (difference <= 0) {
-        document.getElementById(elementId).innerHTML = "Time's up!";
+        const timeElement = document.getElementById(elementId);
+        if (timeElement !== null) {
+            timeElement.innerHTML = "Time's up!";
+        }
+
         return;
     }
 
@@ -93,7 +97,10 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
 
         // Update the element with the formatted time
 
-        document.getElementById(elementId).innerHTML = timerPreText + formattedTime;
+        const timeElement = document.getElementById(elementId);
+        if (timeElement !== null) {
+            timeElement.innerHTML = timerPreText + formattedTime;
+        }
 
         // Decrement the difference by 1 second
         difference -= 1000;
@@ -101,7 +108,9 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
         // Check if the countdown has ended
         if (difference <= 0) {
             clearInterval(intervalId);
-            document.getElementById(elementId).innerHTML = "Time's up!";
+            if (timeElement !== null) {
+                timeElement.innerHTML = "Time's up!";
+            }
         }
     };
 
@@ -109,7 +118,7 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
     intervalId = setInterval(updateTimer, 1000);
 }
 
-function getCurrentTabUrl(tabs) {
+export function getCurrentTabUrl(tabs: string | any[]) {
     if (tabs && tabs.length > 0) {
         const url = tabs[0].url;
         return url
@@ -122,9 +131,9 @@ function addSuccessMessage() {
     var successText = document.createTextNode("Added to timer!");
     successTextElem.appendChild(successText);
     const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
-    existingTimerContainerElem.insertBefore(successTextElem, existingTimerContainerElem.firstChild)
+    existingTimerContainerElem?.insertBefore(successTextElem, existingTimerContainerElem.firstChild)
 }
-function toggleElementVisibility(isVisible, elem) {
+export function toggleElementVisibility(isVisible: boolean, elem: HTMLElement | null) {
     if (elem !== null) {
         if (isVisible === true) {
             elem.classList.remove(CSS_HIDDEN_CLASS)
@@ -133,14 +142,14 @@ function toggleElementVisibility(isVisible, elem) {
         }
     }
 }
-function toggleAddTimerContainerVisibility(isVisible) {
+export function toggleAddTimerContainerVisibility(isVisible: boolean) {
     const addTimerContainerElem = document.getElementById(ADD_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, addTimerContainerElem)
 }
-function checkForExistingTimer() {
+export function checkForExistingTimer() {
     chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         const url = getCurrentTabUrl(tabs);
-        chrome.storage.local.get(url).then((result) => {
+        chrome.storage.local.get(url, (result) => {
             var storedTime = result[url]
             if (storedTime == undefined) {
                 toggleAddTimerContainerVisibility(true)
@@ -150,29 +159,29 @@ function checkForExistingTimer() {
         })
     })
 }
-function updateDOMwithCountDown(timeForCountdown) {
+export function updateDOMwithCountDown(timeForCountdown: string | number | Date) {
     toggleAddTimerContainerVisibility(false)
     createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", true);
     toggleExistingTimerContainerVisibility(true);
 }
-function toggleExistingTimerContainerVisibility(isVisible) {
+export function toggleExistingTimerContainerVisibility(isVisible: boolean) {
     const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, existingTimerContainerElem)
 }
-function getCurrentURL() {
+export function getCurrentURL() {
     return window.location.href
 }
-function greyOutBuyButtons(elemIds = [], endTime, cssClassesToRemove = []) {
-    elemIds.forEach(elemId => {
+export function greyOutBuyButtons(elemIds: any[] | undefined , endTime: string | number | Date, cssClassesToRemove = []) {
+    elemIds?.forEach((elemId: string) => {
         changeBuyButtonStyling(elemId, endTime, cssClassesToRemove)
     });
 }
-function startCtaBtnCountdownTimer(storedTime) {
+function startCtaBtnCountdownTimer(storedTime: string | number | Date) {
     createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', true)
 
 }
-function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = []) {
-    getStoredTime(getCurrentURL()).then((storedTime) => {
+export function updatePageDOMIfTimerExists(buyButtonElemIds: string[] | undefined, cssClassesToRemove = []) {
+    getStoredTime(getCurrentURL()).then((storedTime: undefined) => {
         if (storedTime !== undefined) {
             greyOutBuyButtons(buyButtonElemIds, storedTime, cssClassesToRemove)
             startCtaBtnCountdownTimer(storedTime)
