@@ -1,18 +1,20 @@
-export function getStoredTime(url) {
+const twentyFourHours = 24 * 60 * 60000;
+
+function getStoredTime(url) {
     return chrome.storage.local.get(url).then((result) => {
         return result[url]
     });
 }
-export function setTimeInStorage(url, time) {
+function setTimeInStorage(url, time) {
     var urlTime = {};
     urlTime[url] = time
     return chrome.storage.local.set(urlTime).then(() => time);
 
 }
-export function resetTimeInStorage(url) {
+function resetTimeInStorage(url) {
     chrome.storage.local.remove(url);
 }
-export function getOrSetTime(url) {
+function getOrSetTime(url) {
     return getStoredTime(url).then((storedTime) => {
         if (storedTime == undefined) {
             var currentTime = new Date(Date.now() + twentyFourHours).toString()
@@ -21,3 +23,4 @@ export function getOrSetTime(url) {
         return storedTime
     })
 }
+export { getStoredTime, setTimeInStorage, resetTimeInStorage, getOrSetTime };

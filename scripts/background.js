@@ -19,6 +19,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     else if (message.action === DELETE_TIMER_ACTION) {
         const url = message.url;
         chrome.storage.local.remove(url);
+        sendResponse("Deleted");
     }
-
+    // Run asynchronously
+    return true;
 });
