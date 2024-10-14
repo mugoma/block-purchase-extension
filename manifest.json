@@ -13,7 +13,7 @@
     "tabs"
   ],
   "background": {
-    "service_worker": "scripts/background.js",
+    "service_worker": "scripts/background/background.js",
     "type": "module"
   },
   "content_scripts": [
@@ -22,8 +22,9 @@
         "https://*.amazon.com/*"
       ],
       "js": [
+        "scripts/content_scripts/utils_chrome_api.js",
         "scripts/utils.js",
-        "scripts/amazon.js"
+        "scripts/content_scripts/amazon.js"
       ],
       "css": [
         "styles/style.css"
@@ -35,7 +36,7 @@
       ],
       "js": [
         "scripts/utils.js",
-        "scripts/amazon_cart.js"
+        "scripts/content_scripts/amazon_cart.js"
       ],
       "css": [
         "styles/style.css"

@@ -1,6 +1,3 @@
-//import { getStoredTime, getOrSetTime,  } from "./utils_chrome_api.js";
-const twentyFourHours = 24 * 60 * 60000;
-
 var intervalId;
 const COUNTDOWN_ELEMENT_ID = "countdown-timer";
 const RESET_TIMER_BTN_ID = "reset-timer-btn";

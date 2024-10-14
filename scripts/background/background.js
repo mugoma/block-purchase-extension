@@ -8,16 +8,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === SET_TIMER_ACTION) {
         const url = message.url
         // Add timer if none. Avoid resetting the timer if action is initiated by the page CTA
-        getOrSetTime(url).then((time) => { sendResponse(time) });
+        getOrSetTime(url).then((time) => { sendResponse(time) }).then(()=>{
+            // Send to content script
+
+        });
 
     } else if (message.action === RESET_TIMER_ACTION) {
         const url = message.url
-        resetTimeInStorage(url).then((time) => { sendResponse(time) });
+        resetTimeInStorage(url).then((time) => { sendResponse(time) }).then(()=>{
+            // Send to content script
+        });
     }
     else if (message.action === DELETE_TIMER_ACTION) {
         const url = message.url;
         chrome.storage.local.remove(url);
-        sendResponse("Deleted");
+        sendResponse("Deleted").then(()=>{
+            // Send to content script
+        });
     }
     // Run asynchronously
     return true;
