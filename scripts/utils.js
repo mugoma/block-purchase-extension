@@ -101,9 +101,10 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
             document.getElementById(elementId).innerHTML = "Time's up!";
         }
     };
-
+    // Update every second if needed, otherwise every minute
+    const timeOutPeriod = showSeconds == true ? 1000 : 1000 * 60;
     // Start the countdown timer with an interval of 1 second
-    intervalId = setInterval(updateTimer, 1000);
+    intervalId = setInterval(updateTimer, timeOutPeriod);
 }
 
 function getCurrentTabUrl(tabs) {
@@ -147,9 +148,9 @@ function checkForExistingTimer() {
         })
     })
 }
-function updateDOMwithCountDown(timeForCountdown) {
+function updateDOMwithCountDown(timeForCountdown, showSeconds=true) {
     toggleAddTimerContainerVisibility(false)
-    createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", true);
+    createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", showSeconds);
     toggleExistingTimerContainerVisibility(true);
 }
 function toggleExistingTimerContainerVisibility(isVisible) {
@@ -164,8 +165,8 @@ function greyOutBuyButtons(elemIds = [], endTime, cssClassesToRemove = []) {
         changeBuyButtonStyling(elemId, endTime, cssClassesToRemove)
     });
 }
-function startCtaBtnCountdownTimer(storedTime) {
-    createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', true)
+function startCtaBtnCountdownTimer(storedTime, showSeconds=false) {
+    createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', showSeconds)
 
 }
 function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = []) {
@@ -176,6 +177,6 @@ function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = 
         }
     })
 }
-function removeExistingTimerInterval(){
+function removeExistingTimerInterval() {
     clearInterval(intervalId)
 }
