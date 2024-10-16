@@ -26,3 +26,9 @@ function getOrSetTime(url) {
         return storedTime
     })
 }
+function setEventListenerForMessages(){
+    // chrome.runtime.onMessage((message)=>{
+    //     alert("Got the message", message)
+    // })
+    chrome.runtime.sendMessage("Hi")
+}
