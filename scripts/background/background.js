@@ -18,8 +18,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (message.action === RESET_TIMER_ACTION) {
         console.log("Resetting timer!")
         const url = message.url
-        resetTimeInStorage(url).then((time) => { sendResponse(time) }).then(() => {
-            // TODO: Send to content script
+        resetTimeInStorage(url).then((newEndTime) => { sendResponse(newEndTime) }).then((newEndTime) => {
+            //Send to content script
+            sendMessageToContentScript(url, RESET_TIMER_ACTION, newEndTime)
         });
     }
     else if (message.action === DELETE_TIMER_ACTION) {
@@ -27,7 +28,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.storage.local.remove(url);
         sendResponse("Deleted")
         console.log("Deleting timer!")
-        //TODO: Send to content script
+        //Send to content script
         sendMessageToContentScript(url, DELETE_TIMER_ACTION);
 
     }
