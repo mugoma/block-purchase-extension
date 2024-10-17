@@ -4,7 +4,6 @@ const SET_TIMER_ACTION = 'set-timer';
 const RESET_TIMER_ACTION = 'reset-timer';
 const DELETE_TIMER_ACTION = 'delete-timer';
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log(sender)
     const requestInitiator = message.initiator
     if (message.action === SET_TIMER_ACTION) {
         console.log("Adding timer!")

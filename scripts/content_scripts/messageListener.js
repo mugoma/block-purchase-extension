@@ -2,7 +2,6 @@ const SET_TIMER_ACTION = 'set-timer';
 const RESET_TIMER_ACTION = 'reset-timer';
 const DELETE_TIMER_ACTION = 'delete-timer';
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    console.log(request.endTime);
     const action = request.action;
     const requestInitiator = request.initiator
     if (action !== null && requestInitiator == 'popup') {
