@@ -21,7 +21,7 @@ function addExtensionCTACallback() {
             if (ctaBtnHasTimer == 'false') {
                 // Get url to use as key for storage
                 const url = getCurrentURL()
-                chrome.runtime.sendMessage({ action: 'set-timer', url: url }).then((endTime) => {
+                chrome.runtime.sendMessage({ action: 'set-timer', url: url, initiator: 'content-script' }).then((endTime) => {
                     updatePageDOMWithTimerInterventions(AMZN_BUY_BTNS_IDS, [], endTime)
                 })
                 ctaBtn.setAttribute('data-has-timer', true)
@@ -31,9 +31,6 @@ function addExtensionCTACallback() {
         })
     }
 }
-// document.addEventListener('DOMContentLoaded', function () {
-//     addExtensionCTACallback();
-// });
 
 addExtensionCTA();
 updatePageDOMIfTimerExists(AMZN_BUY_BTNS_IDS, []);

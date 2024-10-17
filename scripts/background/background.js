@@ -5,6 +5,7 @@ const RESET_TIMER_ACTION = 'reset-timer';
 const DELETE_TIMER_ACTION = 'delete-timer';
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log(sender)
+    const requestInitiator = message.initiator
     if (message.action === SET_TIMER_ACTION) {
         console.log("Adding timer!")
         const url = message.url
@@ -12,7 +13,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         getOrSetTime(url).then((endTime) => { sendResponse(endTime); return endTime })
             .then((endTime) => {
                 // Send to content script
-                sendMessageToContentScript(url, SET_TIMER_ACTION, endTime);
+                sendMessageToContentScript(url, SET_TIMER_ACTION, endTime, requestInitiator);
             });
 
     } else if (message.action === RESET_TIMER_ACTION) {
@@ -20,7 +21,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const url = message.url
         resetTimeInStorage(url).then((newEndTime) => { sendResponse(newEndTime) }).then((newEndTime) => {
             //Send to content script
-            sendMessageToContentScript(url, RESET_TIMER_ACTION, newEndTime)
+            sendMessageToContentScript(url, RESET_TIMER_ACTION, newEndTime,requestInitiator)
         });
     }
     else if (message.action === DELETE_TIMER_ACTION) {
@@ -29,7 +30,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse("Deleted")
         console.log("Deleting timer!")
         //Send to content script
-        sendMessageToContentScript(url, DELETE_TIMER_ACTION);
+        sendMessageToContentScript(url, DELETE_TIMER_ACTION, null, requestInitiator);
 
     }
     // Run asynchronously

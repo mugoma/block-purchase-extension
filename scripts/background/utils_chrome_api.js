@@ -26,9 +26,9 @@ function getOrSetTime(url) {
         return storedTime
     })
 }
-function sendMessageToContentScript(url, action, endTime = null) {
+function sendMessageToContentScript(url, action, endTime = null, requestInitiator = 'popup') {
     return chrome.tabs.query({ url: url }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { initiator: "popup", endTime: endTime, action: action },).then(()=>{console.log("Hi")});
+        chrome.tabs.sendMessage(tabs[0].id, { initiator: requestInitiator, endTime: endTime, action: action },).then(() => { console.log("Hi") });
     });
 }
 export { getStoredTime, setTimeInStorage, resetTimeInStorage, getOrSetTime, sendMessageToContentScript };
