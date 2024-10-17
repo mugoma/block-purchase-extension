@@ -24,7 +24,8 @@
       "js": [
         "scripts/content_scripts/utils_chrome_api.js",
         "scripts/utils.js",
-        "scripts/content_scripts/amazon.js"
+        "scripts/content_scripts/amazon.js",
+        "scripts/content_scripts/messageListener.js"
       ],
       "css": [
         "styles/style.css"
