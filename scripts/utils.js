@@ -26,17 +26,30 @@ function createInPageCTAElement() {
 
     return ctaDiv
 }
-function changeBuyButtonStyling(buyButtonId, endTime, cssClassesToRemove = []) {
+function changeBuyButtonStyling(buyButtonId, endTime, cssClassesToRemove = [], newCSSClassesToAdd = ['dull-buy-btn']) {
     const buyButtonElem = document.getElementById(buyButtonId);
     if (buyButtonElem != null) {
         // Make the button gray with white text
         if (cssClassesToRemove.length > 0) {
             buyButtonElem.classList.remove(...cssClassesToRemove);
         }
-        buyButtonElem.classList.add(['dull-buy-btn'])
+        buyButtonElem.classList.add(newCSSClassesToAdd)
         // Add tooltip on when timer will end
         const titleText = "Timer will end at " + new Date(endTime).toLocaleString()
         buyButtonElem.setAttribute("title", titleText)
+    }
+}
+function revertBuyButtonStyling(buyButtonId, cssClassesToRestore = [], cssClassesToRemove = ['dull-buy-btn']) {
+    const buyButtonElem = document.getElementById(buyButtonId);
+    if (buyButtonElem != null) {
+        // Make the button gray with white text
+        if (cssClassesToRemove.length > 0) {
+            buyButtonElem.classList.add(...cssClassesToRestore);
+        }
+        buyButtonElem.classList.remove(cssClassesToRemove)
+        // Add tooltip on when timer will end
+        const titleText = "Start Timer"
+        buyButtonElem.removeAttribute("title")
     }
 }
 
@@ -58,7 +71,7 @@ function handleCountDown(url, proposedTime) {
 }
 
 function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeconds = true) {
-    const timeUnit= showSeconds == true ? 1000 : 1000 * 60;
+    const timeUnit = showSeconds == true ? 1000 : 1000 * 60;
     // Get the target date and time in milliseconds
     const targetTime = new Date(targetDate).getTime();
 
@@ -159,9 +172,14 @@ function toggleExistingTimerContainerVisibility(isVisible) {
 function getCurrentURL() {
     return window.location.href
 }
-function greyOutBuyButtons(elemIds = [], endTime, cssClassesToRemove = []) {
+function greyOutBuyButtons(elemIds = [], endTime, cssClassesToRemove = [], newCSSClasses = ['dull-buy-btn']) {
     elemIds.forEach(elemId => {
-        changeBuyButtonStyling(elemId, endTime, cssClassesToRemove)
+        changeBuyButtonStyling(elemId, endTime, cssClassesToRemove, newCSSClasses)
+    });
+}
+function unGreyOutBuyButtons(elemIds = [], cssClassesToRemove = ['dull-buy-btn'], cssClassesToRestore = []) {
+    elemIds.forEach(elemId => {
+        revertBuyButtonStyling(elemId, cssClassesToRestore, cssClassesToRemove,)
     });
 }
 function startCtaBtnCountdownTimer(storedTime, showSeconds = false) {
@@ -180,4 +198,9 @@ function updatePageDOMWithTimerInterventions(buyButtonElemIds = [], cssClassesTo
 }
 function removeExistingTimerInterval() {
     clearInterval(intervalId)
+}
+function removeTimerFromPage(buyButtonElemIds = [], cssClassesToRemove = ['dull-buy-btn'], cssClassesToRestore = []) {
+    clearInterval(intervalId)
+    unGreyOutBuyButtons(buyButtonElemIds, cssClassesToRemove, cssClassesToRestore)
+
 }

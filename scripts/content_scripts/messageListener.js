@@ -8,8 +8,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (action == SET_TIMER_ACTION) {
             const endTime = request.endTime
             updatePageDOMWithTimerInterventions(AMZN_BUY_BTNS_IDS, [], endTime)
-        }else if(action == DELETE_TIMER_ACTION){
-
+        } else if (action == DELETE_TIMER_ACTION) {
+            removeTimerFromPage(AMZN_BUY_BTNS_IDS, ['dull-buy-btn'], [])
         }
     }
 });
