@@ -21,7 +21,7 @@
 }
 
 .background-brown {
-    background-color: brown;
+    background-color: brown !important;
 }
 .text-white{
     color: white;
