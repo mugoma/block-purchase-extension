@@ -30,3 +30,11 @@ document.getElementById(DELETE_TIMER_LINK_ID).addEventListener("click", () => {
         })
     })
 })
+
+document.getElementById(OPTIONS_PAGE_LINK_ID).addEventListener("click", () => {
+    if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+    } else {
+        window.open(chrome.runtime.getURL('../pages/options.html'));
+    }
+})

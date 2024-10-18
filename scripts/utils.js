@@ -6,6 +6,7 @@ const ADD_TIMER_BTN_ID = "add-timer-btn";
 const ADD_TIMER_CONTAINER_ID = "add-timer-container";
 const CSS_HIDDEN_CLASS = "cls-hidden";
 const DELETE_TIMER_LINK_ID = "delete-timer-link";
+const OPTIONS_PAGE_LINK_ID = "options-page-link";
 const CS_CTA_BTN_ID = "cs_cta_btn"
 
 function createInPageCTAElement() {
