@@ -32,9 +32,15 @@ document.getElementById(DELETE_TIMER_LINK_ID).addEventListener("click", () => {
 })
 
 document.getElementById(OPTIONS_PAGE_LINK_ID).addEventListener("click", () => {
-    if (chrome.runtime.openOptionsPage) {
-        chrome.runtime.openOptionsPage();
-    } else {
-        window.open(chrome.runtime.getURL('../pages/options.html'));
-    }
+
 })
+function checkActiveInterventions() {
+    chrome.storage.local.get({ timer: true }).then(
+        (items) => {
+            if (items.timer == true) {
+                document.getElementById(ADD_TIMER_BTN_ID).classList.add(['dull-buy-btn'])
+            }
+        }
+    );
+}
+document.addEventListener('DOMContentLoaded', checkActiveInterventions);
