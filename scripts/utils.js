@@ -203,5 +203,11 @@ function removeExistingTimerInterval() {
 function removeTimerFromPage(buyButtonElemIds = [], cssClassesToRemove = ['dull-buy-btn'], cssClassesToRestore = []) {
     clearInterval(intervalId)
     unGreyOutBuyButtons(buyButtonElemIds, cssClassesToRemove, cssClassesToRestore)
-
+}
+function openOptionsPage(){
+    if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+    } else {
+        window.open(chrome.runtime.getURL('../pages/options.html'));
+    }
 }
