@@ -35,3 +35,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Run asynchronously
     return true;
 });
+
+// Open onboarding page on installation
+chrome.runtime.onInstalled.addListener(function (object) {
+    let onboardingPageUrl = chrome.runtime.getURL("pages/onboarding.html");
+    if (object.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+        chrome.tabs.create({ url: onboardingPageUrl });
+    }
+});
