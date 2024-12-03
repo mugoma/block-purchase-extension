@@ -32,7 +32,7 @@ document.getElementById(DELETE_TIMER_LINK_ID).addEventListener("click", () => {
 })
 
 document.getElementById(OPTIONS_PAGE_LINK_ID).addEventListener("click", () => {
-
+    openOptionsPage()
 })
 function checkActiveInterventions() {
     chrome.storage.local.get({ timer: true }).then(
