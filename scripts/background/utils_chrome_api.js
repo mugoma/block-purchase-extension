@@ -1,4 +1,6 @@
 const twentyFourHours = 24 * 60 * 60000;
+const DEFERRED_PURCHASES_STORE_KEY = "deferred_purchases"
+const COMPLETED_PURCHASES_STORE_KEY = "completed_purchases"
 
 function getStoredTime(url) {
     return chrome.storage.local.get(url).then((result) => {
@@ -31,4 +33,25 @@ function sendMessageToContentScript(url, action, endTime = null, requestInitiato
         chrome.tabs.sendMessage(tabs[0].id, { initiator: requestInitiator, endTime: endTime, action: action });
     });
 }
-export { getStoredTime, setTimeInStorage, resetTimeInStorage, getOrSetTime, sendMessageToContentScript };
+function recordPurchaseDeferment(url, wasDeferred) {
+    var storageKey;
+    if (wasDeferred === true) {
+        storageKey = DEFERRED_PURCHASES_STORE_KEY
+    } else if (wasDeferred === false) {
+        storageKey = COMPLETED_PURCHASES_STORE_KEY;
+    }
+    return chrome.storage.local.get(storageKey).then((result) => {
+        const storedResult = result[storageKey]
+        var parsedResult;
+        if (storedResult == undefined) {
+            parsedResult = []
+        } else {
+            parsedResult = Array(...JSON.parse(storedResult))
+        }
+        parsedResult.push(url)
+        const storeValue = {};
+        storeValue[storageKey] = JSON.stringify(parsedResult)
+        return chrome.storage.local.set(storeValue);
+    })
+}
+export { getStoredTime, setTimeInStorage, resetTimeInStorage, getOrSetTime, sendMessageToContentScript, recordPurchaseDeferment };

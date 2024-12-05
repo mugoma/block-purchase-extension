@@ -1,8 +1,10 @@
-import { getOrSetTime, resetTimeInStorage, sendMessageToContentScript } from "./utils_chrome_api.js";
-
+import { getOrSetTime, resetTimeInStorage, sendMessageToContentScript, recordPurchaseDeferment } from "./utils_chrome_api.js";
+// Message Actions
 const SET_TIMER_ACTION = 'set-timer';
 const RESET_TIMER_ACTION = 'reset-timer';
 const DELETE_TIMER_ACTION = 'delete-timer';
+const ADD_PURCHASE_TIMER_STAT = 'add-purchase-stat';
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const requestInitiator = message.initiator
     if (message.action === SET_TIMER_ACTION) {
@@ -20,7 +22,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const url = message.url
         resetTimeInStorage(url).then((newEndTime) => { sendResponse(newEndTime) }).then((newEndTime) => {
             //Send to content script
-            sendMessageToContentScript(url, RESET_TIMER_ACTION, newEndTime,requestInitiator)
+            sendMessageToContentScript(url, RESET_TIMER_ACTION, newEndTime, requestInitiator)
         });
     }
     else if (message.action === DELETE_TIMER_ACTION) {
@@ -30,6 +32,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log("Deleting timer!")
         //Send to content script
         sendMessageToContentScript(url, DELETE_TIMER_ACTION, null, requestInitiator);
+
+    } else if (message.action === ADD_PURCHASE_TIMER_STAT) {
+        const url = message.url
+        const wasDeferred = message.wasDeferred
+        recordPurchaseDeferment(url, wasDeferred).then(() => { sendResponse("Completed") })
 
     }
     // Run asynchronously
