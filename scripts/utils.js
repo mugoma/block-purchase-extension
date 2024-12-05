@@ -1,6 +1,7 @@
 var intervalId;
+// HTML Element variables
 const COUNTDOWN_ELEMENT_ID = "countdown-timer";
-const RESET_TIMER_BTN_ID = "reset-timer-btn";
+const RESET_TIMER_BTNS_CLASS = "reset-timer-btn";
 const EXISTING_TIMER_CONTAINER_ID = "existing-timer-container";
 const ADD_TIMER_BTN_ID = "add-timer-btn";
 const ADD_TIMER_CONTAINER_ID = "add-timer-container";
@@ -9,6 +10,12 @@ const DELETE_TIMER_LINK_ID = "delete-timer-link";
 const OPTIONS_PAGE_LINK_ID = "options-page-link";
 const HOW_TO_USE_PAGE_LINK_ID = "how-to-use-page-link";
 const CS_CTA_BTN_ID = "cs_cta_btn"
+const COMPLETED_TIMER_CONTAINER_ID = "completed-timer-container";
+const HIDDEN_CLASS = "cls-hidden";
+const PURCHASE_FEEDBACK_BTNS_CLASS = "purchase-feedback";
+const ASK_FEEDBACK_SECTION_ID = "completed-timer-ask-feedback";
+const FEEDBACK_COMPLETED_SECTION_ID = "completed-timer-completed-feedback";
+//const VISIBLE_CLASS="cls-visible";
 
 function createInPageCTAElement() {
     // Div
@@ -85,8 +92,8 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
 
     // Check if the countdown has already ended
     if (difference <= 0) {
-        document.getElementById(elementId).innerHTML = "Time's up!";
-        return;
+        //document.getElementById(elementId).innerHTML = "Time's up!";
+        return false;
     }
 
     // Define an update function to be called every second
@@ -114,11 +121,14 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
         // Check if the countdown has ended
         if (difference <= 0) {
             clearInterval(intervalId);
-            document.getElementById(elementId).innerHTML = "Time's up!";
+            toggleExistingTimerContainerVisibility(false);
+            toggleCompletedTimerContainerVisibility(true);
+            //document.getElementById(elementId).innerHTML = "Time's up!";
         }
     };
     // Start the countdown timer with an interval of 1 second
     intervalId = setInterval(updateTimer, timeUnit);
+    return true;
 }
 
 function getCurrentTabUrl(tabs) {
@@ -164,12 +174,24 @@ function checkForExistingTimer() {
 }
 function updateDOMwithCountDown(timeForCountdown, showSeconds = true) {
     toggleAddTimerContainerVisibility(false)
-    createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", showSeconds);
-    toggleExistingTimerContainerVisibility(true);
+    var started_timer = createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", showSeconds);
+    if (started_timer === true) {
+        toggleExistingTimerContainerVisibility(true);
+        toggleCompletedTimerContainerVisibility(false)
+
+    } else {
+        toggleCompletedTimerContainerVisibility(true)
+        toggleExistingTimerContainerVisibility(false);
+
+    }
 }
 function toggleExistingTimerContainerVisibility(isVisible) {
     const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, existingTimerContainerElem)
+}
+function toggleCompletedTimerContainerVisibility(isVisible) {
+    const completedTimerContainerElem = document.getElementById(COMPLETED_TIMER_CONTAINER_ID)
+    toggleElementVisibility(isVisible, completedTimerContainerElem)
 }
 function getCurrentURL() {
     return window.location.href
@@ -205,10 +227,16 @@ function removeTimerFromPage(buyButtonElemIds = [], cssClassesToRemove = ['dull-
     clearInterval(intervalId)
     unGreyOutBuyButtons(buyButtonElemIds, cssClassesToRemove, cssClassesToRestore)
 }
-function openOptionsPage(){
+function openOptionsPage() {
     if (chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
     } else {
         window.open(chrome.runtime.getURL('../pages/options.html'));
     }
+}
+function handlePostFeedbackSubmission() {
+    toggleElementVisibility(false,
+        document.getElementById(ASK_FEEDBACK_SECTION_ID));
+    toggleElementVisibility(true,
+        document.getElementById(FEEDBACK_COMPLETED_SECTION_ID));
 }
