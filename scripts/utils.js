@@ -17,6 +17,12 @@ const ASK_FEEDBACK_SECTION_ID = "completed-timer-ask-feedback";
 const FEEDBACK_COMPLETED_SECTION_ID = "completed-timer-completed-feedback";
 //const VISIBLE_CLASS="cls-visible";
 
+/**
+ * Creates a Call-to-Action (CTA) button element within a container div.
+ * The button is styled and set to start a timer when clicked.
+ *
+ * @returns {HTMLDivElement} A div containing the CTA button element.
+ */
 function createInPageCTAElement() {
     // Div
     const ctaDiv = document.createElement("div");
@@ -35,6 +41,15 @@ function createInPageCTAElement() {
 
     return ctaDiv
 }
+/**
+ * Changes the styling of a "buy" button and sets a tooltip showing when the timer will end.
+ *
+ * @param {string} buyButtonId - The ID of the buy button element.
+ * @param {number} endTime - The timestamp indicating when the timer ends.
+ * @param {Array<string>} cssClassesToRemove - An array of CSS classes to remove from the button.
+ * @param {Array<string>} newCSSClassesToAdd - An array of CSS classes to add to the button.
+ */
+
 function changeBuyButtonStyling(buyButtonId, endTime, cssClassesToRemove = [], newCSSClassesToAdd = ['dull-buy-btn']) {
     const buyButtonElem = document.getElementById(buyButtonId);
     if (buyButtonElem != null) {
@@ -48,6 +63,13 @@ function changeBuyButtonStyling(buyButtonId, endTime, cssClassesToRemove = [], n
         buyButtonElem.setAttribute("title", titleText)
     }
 }
+/**
+ * Reverts the styling of a "buy" button to its original state.
+ *
+ * @param {string} buyButtonId - The ID of the buy button element.
+ * @param {Array<string>} cssClassesToRestore - An array of CSS classes to restore on the button.
+ * @param {Array<string>} cssClassesToRemove - An array of CSS classes to remove from the button.
+ */
 function revertBuyButtonStyling(buyButtonId, cssClassesToRestore = [], cssClassesToRemove = ['dull-buy-btn']) {
     const buyButtonElem = document.getElementById(buyButtonId);
     if (buyButtonElem != null) {
@@ -62,6 +84,13 @@ function revertBuyButtonStyling(buyButtonId, cssClassesToRestore = [], cssClasse
     }
 }
 
+/**
+ * Sets a click event listener on an element and executes a callback when clicked.
+ *
+ * @param {HTMLElement} element - The HTML element to attach the click event to.
+ * @param {Function} callback - The function to execute when the element is clicked.
+ */
+
 function setClickEventListenerToElement(element, callback) {
     element.addEventListener("click", () => {
         callback()
@@ -69,7 +98,12 @@ function setClickEventListenerToElement(element, callback) {
 }
 
 
-
+/**
+ * Handles countdown logic by retrieving or setting the timer and updating the DOM accordingly.
+ *
+ * @param {string} url - The URL used to identify the timer in storage.
+ * @param {number} proposedTime - The proposed time for the countdown.
+ */
 function handleCountDown(url, proposedTime) {
     getOrSetTime(url).then((timeForCountdown) => {
         addSuccessMessage()
@@ -78,7 +112,15 @@ function handleCountDown(url, proposedTime) {
         console.error('Failed to add URL to storage or create countdown:', error);
     });
 }
-
+/**
+ * Creates a countdown timer that updates a specified element in the DOM.
+ *
+ * @param {string|Date} targetDate - The target date and time for the countdown.
+ * @param {string} elementId - The ID of the HTML element to update with the timer.
+ * @param {string} timerPreText - Text to display before the countdown timer.
+ * @param {boolean} showSeconds - Whether to show seconds in the countdown timer.
+ * @returns {boolean} Returns true if the timer was successfully created, otherwise false.
+ */
 function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeconds = true) {
     const timeUnit = showSeconds == true ? 1000 : 1000 * 60;
     // Get the target date and time in milliseconds
@@ -131,6 +173,12 @@ function createCountdownTimer(targetDate, elementId, timerPreText = '', showSeco
     return true;
 }
 
+/**
+ * Retrieves the URL of the current active tab.
+ *
+ * @param {Array} tabs - An array of tab objects.
+ * @returns {string|undefined} The URL of the current tab, or undefined if not found.
+ */
 function getCurrentTabUrl(tabs) {
     if (tabs && tabs.length > 0) {
         const url = tabs[0].url;
@@ -139,6 +187,10 @@ function getCurrentTabUrl(tabs) {
         console.error("Failed to get the current tab's URL.");
     }
 }
+
+/**
+ * Adds a success message indicating that the timer has been added.
+ */
 function addSuccessMessage() {
     var successTextElem = document.createElement("p");
     var successText = document.createTextNode("Added to timer!");
@@ -146,6 +198,12 @@ function addSuccessMessage() {
     const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
     existingTimerContainerElem.insertBefore(successTextElem, existingTimerContainerElem.firstChild)
 }
+/**
+ * Toggles the visibility of a given HTML element by adding or removing a CSS class.
+ *
+ * @param {boolean} isVisible - Whether the element should be visible.
+ * @param {HTMLElement|null} elem - The element to toggle visibility for.
+ */
 function toggleElementVisibility(isVisible, elem) {
     if (elem !== null) {
         if (isVisible === true) {
@@ -155,10 +213,18 @@ function toggleElementVisibility(isVisible, elem) {
         }
     }
 }
+/**
+ * Toggles the visibility of the "Add Timer" container.
+ *
+ * @param {boolean} isVisible - Whether the container should be visible.
+ */
 function toggleAddTimerContainerVisibility(isVisible) {
     const addTimerContainerElem = document.getElementById(ADD_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, addTimerContainerElem)
 }
+/**
+ * Checks if a timer already exists for the current tab's URL and updates the DOM accordingly.
+ */
 function checkForExistingTimer() {
     chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         const url = getCurrentTabUrl(tabs);
@@ -172,6 +238,12 @@ function checkForExistingTimer() {
         })
     })
 }
+/**
+ * Updates the DOM to display a countdown timer based on the provided time.
+ *
+ * @param {number|string|Date} timeForCountdown - The time to count down to.
+ * @param {boolean} showSeconds - Whether to show seconds in the countdown.
+ */
 function updateDOMwithCountDown(timeForCountdown, showSeconds = true) {
     toggleAddTimerContainerVisibility(false)
     var started_timer = createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", showSeconds);
@@ -185,30 +257,78 @@ function updateDOMwithCountDown(timeForCountdown, showSeconds = true) {
 
     }
 }
+/**
+ * Toggles the visibility of the "Existing Timer" container.
+ *
+ * @param {boolean} isVisible - Whether the container should be visible.
+ */
+
 function toggleExistingTimerContainerVisibility(isVisible) {
     const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, existingTimerContainerElem)
 }
+/**
+ * Toggles the visibility of the "Completed Timer" container.
+ *
+ * @param {boolean} isVisible - Whether the container should be visible.
+ */
+
 function toggleCompletedTimerContainerVisibility(isVisible) {
     const completedTimerContainerElem = document.getElementById(COMPLETED_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, completedTimerContainerElem)
 }
+/**
+ * Retrieves the current page's URL.
+ *
+ * @returns {string} The current page URL.
+ */
+
 function getCurrentURL() {
     return window.location.href
 }
+/**
+ * Greys out multiple "buy" buttons and sets tooltips with the timer end time.
+ *
+ * @param {Array<string>} elemIds - An array of button element IDs.
+ * @param {number} endTime - The timestamp when the timer ends.
+ * @param {Array<string>} cssClassesToRemove - CSS classes to remove.
+ * @param {Array<string>} newCSSClasses - CSS classes to add.
+ */
+
 function greyOutBuyButtons(elemIds = [], endTime, cssClassesToRemove = [], newCSSClasses = ['dull-buy-btn']) {
     elemIds.forEach(elemId => {
         changeBuyButtonStyling(elemId, endTime, cssClassesToRemove, newCSSClasses)
     });
 }
+/**
+ * Restores the original state of multiple "buy" buttons.
+ *
+ * @param {Array<string>} elemIds - An array of button element IDs.
+ * @param {Array<string>} cssClassesToRemove - CSS classes to remove.
+ * @param {Array<string>} cssClassesToRestore - CSS classes to restore.
+ */
+
 function unGreyOutBuyButtons(elemIds = [], cssClassesToRemove = ['dull-buy-btn'], cssClassesToRestore = []) {
     elemIds.forEach(elemId => {
         revertBuyButtonStyling(elemId, cssClassesToRestore, cssClassesToRemove,)
     });
 }
+/**
+ * Starts a countdown timer for the CTA button.
+ *
+ * @param {number|string|Date} storedTime - The target time for the countdown.
+ * @param {boolean} showSeconds - Whether to show seconds in the countdown.
+ */
 function startCtaBtnCountdownTimer(storedTime, showSeconds = false) {
     createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', showSeconds)
 }
+/**
+ * Updates the page DOM if a timer exists in storage for the current URL.
+ *
+ * @param {Array<string>} buyButtonElemIds - An array of button element IDs.
+ * @param {Array<string>} cssClassesToRemove - CSS classes to remove from the buttons.
+ */
+
 function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = []) {
     getStoredTime(getCurrentURL()).then((storedTime) => {
         if (storedTime !== undefined) {
@@ -216,17 +336,38 @@ function updatePageDOMIfTimerExists(buyButtonElemIds = [], cssClassesToRemove = 
         }
     })
 }
+/**
+ * Updates the page by greying out buttons and starting a countdown timer for the CTA button.
+ *
+ * @param {Array<string>} buyButtonElemIds - An array of button element IDs.
+ * @param {Array<string>} cssClassesToRemove - CSS classes to remove from the buttons.
+ * @param {number} endTime - The timestamp when the timer ends.
+ */
+
 function updatePageDOMWithTimerInterventions(buyButtonElemIds = [], cssClassesToRemove = [], endTime) {
     greyOutBuyButtons(buyButtonElemIds, endTime, cssClassesToRemove)
     startCtaBtnCountdownTimer(endTime)
 }
+/**
+ * Clears the existing countdown timer interval.
+ */
 function removeExistingTimerInterval() {
     clearInterval(intervalId)
 }
+/**
+ * Removes the timer from the page and resets button styling.
+ *
+ * @param {Array<string>} buyButtonElemIds - An array of button element IDs.
+ * @param {Array<string>} cssClassesToRemove - CSS classes to remove from the buttons.
+ * @param {Array<string>} cssClassesToRestore - CSS classes to restore on the buttons.
+ */
 function removeTimerFromPage(buyButtonElemIds = [], cssClassesToRemove = ['dull-buy-btn'], cssClassesToRestore = []) {
     clearInterval(intervalId)
     unGreyOutBuyButtons(buyButtonElemIds, cssClassesToRemove, cssClassesToRestore)
 }
+/**
+ * Opens the extension's options page.
+ */
 function openOptionsPage() {
     if (chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
@@ -234,6 +375,9 @@ function openOptionsPage() {
         window.open(chrome.runtime.getURL('../pages/options.html'));
     }
 }
+/**
+ * Handles the submission of post-feedback, toggling visibility of relevant sections.
+ */
 function handlePostFeedbackSubmission() {
     toggleElementVisibility(false,
         document.getElementById(ASK_FEEDBACK_SECTION_ID));
