@@ -83,6 +83,14 @@ Array.from(document.getElementsByClassName(PURCHASE_FEEDBACK_BTNS_CLASS)).forEac
 document.getElementById(OPTIONS_PAGE_LINK_ID).addEventListener("click", () => {
     openOptionsPage()
 })
+
+/**
+ * Adds a click event listener to the "Statistics Page" link.
+ * When clicked, it opens the user statistics page.
+ */
+document.getElementById(STATS_PAGE_LINK_ID).addEventListener("click", () => {
+    openPage(STATS_PAGE_NAME)
+})
 /**
  * Checks if any active interventions (timers) exist in storage.
  * If a timer exists, it updates the "Add Timer" button's styling to indicate its disabled state.
