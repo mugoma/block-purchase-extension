@@ -10,16 +10,19 @@ const DELETE_TIMER_LINK_ID = "delete-timer-link";
 const OPTIONS_PAGE_LINK_ID = "options-page-link";
 const HOW_TO_USE_PAGE_LINK_ID = "how-to-use-page-link";
 const STATS_PAGE_LINK_ID = "stats-page-link";
+const STATS_PAGE_LINK_CLASS= "stats-page-links";
 const CS_CTA_BTN_ID = "cs_cta_btn"
 const COMPLETED_TIMER_CONTAINER_ID = "completed-timer-container";
 const HIDDEN_CLASS = "cls-hidden";
 const PURCHASE_FEEDBACK_BTNS_CLASS = "purchase-feedback";
 const ASK_FEEDBACK_SECTION_ID = "completed-timer-ask-feedback";
 const FEEDBACK_COMPLETED_SECTION_ID = "completed-timer-completed-feedback";
-const STATS_PAGE_NAME="my-statistics.html";
-const HOW_TO_USE_PAGE_NAME="how-to-use.html";
+const STATS_PAGE_NAME = "my-statistics.html";
+const HOW_TO_USE_PAGE_NAME = "how-to-use.html";
 //const VISIBLE_CLASS="cls-visible";
-
+// Constants for Chrome storage keys
+const DEFERRED_PURCHASES_STORE_KEY = "deferred_purchases";
+const COMPLETED_PURCHASES_STORE_KEY = "completed_purchases";
 /**
  * Creates a Call-to-Action (CTA) button element within a container div.
  * The button is styled and set to start a timer when clicked.
@@ -255,8 +258,13 @@ function updateDOMwithCountDown(timeForCountdown, showSeconds = true) {
         toggleCompletedTimerContainerVisibility(false)
 
     } else {
-        toggleCompletedTimerContainerVisibility(true)
         toggleExistingTimerContainerVisibility(false);
+        toggleCompletedTimerContainerVisibility(true);
+        // Hide feedback buttons if feedback has already been provided
+        checkIfFeedbackIsProvided().then((wasFeedbackProvided) => {
+            if (wasFeedbackProvided == true) { handlePostFeedbackSubmission() }
+        })
+
 
     }
 }
@@ -393,4 +401,50 @@ function handlePostFeedbackSubmission() {
         document.getElementById(ASK_FEEDBACK_SECTION_ID));
     toggleElementVisibility(true,
         document.getElementById(FEEDBACK_COMPLETED_SECTION_ID));
+}
+/**
+ * Retrieves the stored deferred and non-deferred (completed) purchases from Chrome's local storage.
+ *
+ * @returns {Promise<{ deferred: string[], completed: string[] }>} A promise resolving to an object containing deferred and completed purchases.
+ */
+function getStoredPurchases() {
+    return chrome.storage.local.get([DEFERRED_PURCHASES_STORE_KEY, COMPLETED_PURCHASES_STORE_KEY]).then((result) => {
+        const deferred = result[DEFERRED_PURCHASES_STORE_KEY] ? JSON.parse(result[DEFERRED_PURCHASES_STORE_KEY]) : [];
+        const completed = result[COMPLETED_PURCHASES_STORE_KEY] ? JSON.parse(result[COMPLETED_PURCHASES_STORE_KEY]) : [];
+        return { deferred, completed };
+    });
+}
+/**
+ * 
+ * @param {string} url Url of current page
+ * @returns {Promise<boolean>} Boolean representing if feedback was provided for 
+ *      the current timer. True means feedback was provided
+ */
+function checkIfFeedbackIsProvided() {
+    return chrome.tabs.query(
+        { active: true, currentWindow: true }).then((tabs) => {
+            return getCurrentTabUrl(tabs);
+        }).then((url) => {
+            return Promise.all([getStoredTime(url), getStoredPurchases()])
+                .then((values) => {
+                    console.log(values);
+                    const storedTime = values[0];
+                    const storedFeedback = values[1].deferred.concat(values[1].completed);
+
+                    // Find feedback entry that matches the given URL
+                    //TODO: Remove old logic
+                    const feedbackEntry = storedFeedback.find(entry => ((entry?.url === url) || entry == url) & (!entry?.timerEndTime || new Date(storedTime).getTime() == new Date(entry.timerEndTime).getTime()));
+
+                    if (!feedbackEntry) {
+                        console.log("No feedback provided for this URL.");
+                        return false;
+                    } else {
+                        return true
+                    }
+                })
+                .catch((error) => {
+                    console.error("An error occurred while checking feedback:", error);
+                    return false;
+                });
+        })
 }
