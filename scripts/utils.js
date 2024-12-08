@@ -16,8 +16,8 @@ const HIDDEN_CLASS = "cls-hidden";
 const PURCHASE_FEEDBACK_BTNS_CLASS = "purchase-feedback";
 const ASK_FEEDBACK_SECTION_ID = "completed-timer-ask-feedback";
 const FEEDBACK_COMPLETED_SECTION_ID = "completed-timer-completed-feedback";
-const STATS_PAGE_NAME="my-statistics.html";
-const HOW_TO_USE_PAGE_NAME="how-to-use.html";
+const STATS_PAGE_NAME = "my-statistics.html";
+const HOW_TO_USE_PAGE_NAME = "how-to-use.html";
 //const VISIBLE_CLASS="cls-visible";
 
 /**
@@ -394,3 +394,4 @@ function handlePostFeedbackSubmission() {
     toggleElementVisibility(true,
         document.getElementById(FEEDBACK_COMPLETED_SECTION_ID));
 }
+// export { checkForExistingTimer, ADD_TIMER_BTN_ID, RESET_TIMER_BTNS_CLASS, DELETE_TIMER_LINK_ID, PURCHASE_FEEDBACK_BTNS_CLASS, OPTIONS_PAGE_LINK_ID, STATS_PAGE_LINK_ID, getCurrentTabUrl,updateDOMwithCountDown };
