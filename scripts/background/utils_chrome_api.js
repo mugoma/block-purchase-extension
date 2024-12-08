@@ -1,8 +1,5 @@
 // Time constant representing 24 hours in milliseconds
 const twentyFourHours = 24 * 60 * 60000;
-// Keys used for storing deferred and completed purchase data in Chrome's local storage
-const DEFERRED_PURCHASES_STORE_KEY = "deferred_purchases"
-const COMPLETED_PURCHASES_STORE_KEY = "completed_purchases"
 
 /**
  * Retrieves the stored time for a given URL from Chrome's local storage.
@@ -77,7 +74,7 @@ function sendMessageToContentScript(url, action, endTime = null, requestInitiato
  * @param {boolean} wasDeferred - True if the purchase was deferred, false if completed.
  * @returns {Promise<void>} A promise that resolves once the data is recorded.
  */
-function recordPurchaseDeferment(url, wasDeferred) {
+function recordPurchaseDeferment(url, wasDeferred, timerEndTime) {
     var storageKey;
     // Determine the appropriate storage key based on deferment status
     if (wasDeferred === true) {
@@ -97,7 +94,7 @@ function recordPurchaseDeferment(url, wasDeferred) {
             parsedResult = Array(...JSON.parse(storedResult))
         }
         // Add the URL to the appropriate list
-        parsedResult.push(url)
+        parsedResult.unshift({ url: url, timerEndTime: timerEndTime })
         // Store the updated list back to local storage
         const storeValue = {};
         storeValue[storageKey] = JSON.stringify(parsedResult)
