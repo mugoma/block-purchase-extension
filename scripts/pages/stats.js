@@ -1,7 +1,3 @@
-// Constants for Chrome storage keys
-const DEFERRED_PURCHASES_STORE_KEY = "deferred_purchases";
-const COMPLETED_PURCHASES_STORE_KEY = "completed_purchases";
-
 // IDs for elements where the purchase lists will be displayed
 const DEFERRED_PURCHASES_LIST_ID = "deferred-purchases-list";
 const COMPLETED_PURCHASES_LIST_ID = "completed-purchases-list";
@@ -19,18 +15,6 @@ let completedPurchases = [];
 let deferredPage = 1;
 let completedPage = 1;
 
-/**
- * Retrieves the stored deferred and non-deferred (completed) purchases from Chrome's local storage.
- *
- * @returns {Promise<{ deferred: string[], completed: string[] }>} A promise resolving to an object containing deferred and completed purchases.
- */
-function getStoredPurchases() {
-    return chrome.storage.local.get([DEFERRED_PURCHASES_STORE_KEY, COMPLETED_PURCHASES_STORE_KEY]).then((result) => {
-        const deferred = result[DEFERRED_PURCHASES_STORE_KEY] ? JSON.parse(result[DEFERRED_PURCHASES_STORE_KEY]) : [];
-        const completed = result[COMPLETED_PURCHASES_STORE_KEY] ? JSON.parse(result[COMPLETED_PURCHASES_STORE_KEY]) : [];
-        return { deferred, completed };
-    });
-}
 
 /**
  * Renders a paginated list of purchases in the specified container.
@@ -57,9 +41,11 @@ function renderPaginatedList(purchases, containerId, currentPage) {
     }
 
     // Create list items for each purchase URL
-    paginatedItems.forEach((url, index) => {
+    paginatedItems.forEach((storedInfo, index) => {
         const listItem = document.createElement("li");
-        listItem.textContent = `${startIndex + index + 1}. ${url}`;
+        const url = storedInfo?.url ? storedInfo.url : storedInfo
+        const timerEndTime = storedInfo?.timerEndTime ? ` | ${storedInfo.timerEndTime}` : ''
+        listItem.textContent = `${startIndex + index + 1}. ${url}${timerEndTime}`;
         container.appendChild(listItem);
     });
 
@@ -125,7 +111,8 @@ function renderPaginationControls(container, purchases, currentPage, containerId
     // Append the pagination controls to the container
     if (totalPages !== 1) {
         container.appendChild(paginationDiv);
-    }}
+    }
+}
 
 // Event listener to run once the DOM content is fully loaded
 document.addEventListener("DOMContentLoaded", () => {

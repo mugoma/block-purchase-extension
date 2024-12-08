@@ -45,8 +45,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (message.action === ADD_PURCHASE_TIMER_STAT) {
         const url = message.url
         const wasDeferred = message.wasDeferred
+        const timerEndTime = message.timerEndTime
         // Record the purchase deferment and respond once completed
-        recordPurchaseDeferment(url, wasDeferred).then(() => { sendResponse("Completed") })
+        recordPurchaseDeferment(url, wasDeferred, timerEndTime).then(() => { sendResponse("Completed") })
 
     }
     // Indicate that the response will be sent asynchronously

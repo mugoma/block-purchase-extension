@@ -66,11 +66,16 @@ Array.from(document.getElementsByClassName(PURCHASE_FEEDBACK_BTNS_CLASS)).forEac
             var url = getCurrentTabUrl(tabs);
             // TODO: Streamline this logic
             // Determine if the purchase was deferred based on the button's dataset
-
-            const wasDeferred = event.target.dataset.proceededWithPurchase === "y" ? false : true;
-            chrome.runtime.sendMessage({ action: 'add-purchase-stat', url: url, initiator: 'popup', wasDeferred: wasDeferred }).then(() => {
-                // Handle the UI updates after feedback submission
-                handlePostFeedbackSubmission()
+            getStoredTime(url).then((timerEndTime) => {
+                const wasDeferred = event.target.dataset.proceededWithPurchase === "y" ? false : true;
+                chrome.runtime.sendMessage(
+                    {
+                        action: 'add-purchase-stat', url: url, initiator: 'popup',
+                        wasDeferred: wasDeferred, timerEndTime: timerEndTime
+                    }).then(() => {
+                        // Handle the UI updates after feedback submission
+                        handlePostFeedbackSubmission()
+                    })
             })
         })
     })
@@ -88,9 +93,10 @@ document.getElementById(OPTIONS_PAGE_LINK_ID).addEventListener("click", () => {
  * Adds a click event listener to the "Statistics Page" link.
  * When clicked, it opens the user statistics page.
  */
-document.getElementById(STATS_PAGE_LINK_ID).addEventListener("click", () => {
+Array.from(document.getElementsByClassName(STATS_PAGE_LINK_CLASS)).forEach(element => {
+    element.addEventListener("click", () => {
     openPage(STATS_PAGE_NAME)
-})
+})})
 /**
  * Checks if any active interventions (timers) exist in storage.
  * If a timer exists, it updates the "Add Timer" button's styling to indicate its disabled state.
@@ -99,6 +105,7 @@ function checkActiveInterventions() {
     chrome.storage.local.get({ timer: true }).then(
         (items) => {
             if (items.timer == true) {
+                //TODO: Add message informing user the intervention is disabled
                 document.getElementById(ADD_TIMER_BTN_ID).classList.add(['dull-buy-btn'])
             }
         }
