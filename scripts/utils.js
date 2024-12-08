@@ -9,12 +9,15 @@ const CSS_HIDDEN_CLASS = "cls-hidden";
 const DELETE_TIMER_LINK_ID = "delete-timer-link";
 const OPTIONS_PAGE_LINK_ID = "options-page-link";
 const HOW_TO_USE_PAGE_LINK_ID = "how-to-use-page-link";
+const STATS_PAGE_LINK_ID = "stats-page-link";
 const CS_CTA_BTN_ID = "cs_cta_btn"
 const COMPLETED_TIMER_CONTAINER_ID = "completed-timer-container";
 const HIDDEN_CLASS = "cls-hidden";
 const PURCHASE_FEEDBACK_BTNS_CLASS = "purchase-feedback";
 const ASK_FEEDBACK_SECTION_ID = "completed-timer-ask-feedback";
 const FEEDBACK_COMPLETED_SECTION_ID = "completed-timer-completed-feedback";
+const STATS_PAGE_NAME="my-statistics.html";
+const HOW_TO_USE_PAGE_NAME="how-to-use.html";
 //const VISIBLE_CLASS="cls-visible";
 
 /**
@@ -372,8 +375,15 @@ function openOptionsPage() {
     if (chrome.runtime.openOptionsPage) {
         chrome.runtime.openOptionsPage();
     } else {
-        window.open(chrome.runtime.getURL('../pages/options.html'));
+        openPage("options.html");
     }
+}
+/**
+ * Open one of the pages in the 'pages' directory. 
+ * @param {string} pageRelativePath -Relative page path with file extension. 
+ */
+function openPage(pageRelativePath) {
+    window.open(chrome.runtime.getURL('../pages/' + pageRelativePath));
 }
 /**
  * Handles the submission of post-feedback, toggling visibility of relevant sections.
