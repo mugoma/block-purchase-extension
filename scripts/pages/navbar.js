@@ -4,5 +4,9 @@ document.getElementById(OPTIONS_PAGE_LINK_ID)?.addEventListener("click", () => {
 })
 // Add a click event listener to the element with the ID stored in HOW_TO_USE_PAGE_LINK_ID.
 document.getElementById(HOW_TO_USE_PAGE_LINK_ID)?.addEventListener("click", () => {
-    window.open(chrome.runtime.getURL('../pages/how-to-use.html'));
+    openPage(HOW_TO_USE_PAGE_NAME)
+})
+// Add a click event listener to the element with the ID stored in STATS_PAGE_LINK_ID.
+document.getElementById(STATS_PAGE_LINK_ID)?.addEventListener("click", () => {
+    openPage(STATS_PAGE_NAME)
 })
