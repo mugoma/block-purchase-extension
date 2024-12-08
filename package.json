@@ -1,0 +1,19 @@
+{
+  "name": "block-purchase-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension to help reduce impulsive online shopping. ",
+  "main": "index.js",
+  "dependencies": {
+    "typescript": "^5.6.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0"
+  },
+  "scripts": {
+    "test": "npm jest"
+  },
+  "author": "",
+  "license": "ISC"
+}
