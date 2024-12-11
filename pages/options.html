@@ -9,6 +9,32 @@
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg background-brown">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white" href="#">Block Purchase Extension</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" aria-current="page"
+                            href="https://github.com/mugoma/block-purchase-extension" target="_blank"
+                            id="github-link">Github</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" aria-current="page" href="#" id="how-to-use-page-link">How to use
+                            this extension</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" aria-current="page" href="#" id="stats-page-link">My
+                            Statistics</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <h1>Extension Options</h1>
         <p>Use this page to customize which interventions you want</p>
@@ -29,8 +55,8 @@
                     Social Influence(User Reviews)
                 </label>
                 <div id="reviewsHelpBlock" class="form-text">
-                    Add an overlay to the reviews section of a shopping site. 
-                  </div>
+                    Add an overlay to the reviews section of a shopping site.
+                </div>
             </div>
             <div id="status"></div>
             <button type="button" class="btn background-brown text-white" id="save">Save</button>
@@ -39,7 +65,9 @@
         </form>
     </div>
 
+    <script src="../scripts/utils.js"></script>
     <script src="../scripts/pages/options.js"></script>
+    <script src="../scripts/pages/navbar.js"></script>
 </body>
 
 </html>

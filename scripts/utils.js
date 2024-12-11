@@ -8,6 +8,7 @@ const ADD_TIMER_CONTAINER_ID = "add-timer-container";
 const CSS_HIDDEN_CLASS = "cls-hidden";
 const DELETE_TIMER_LINK_ID = "delete-timer-link";
 const OPTIONS_PAGE_LINK_ID = "options-page-link";
+const OPTIONS_PAGE_LINK_CLASS = "options-page-links";
 const HOW_TO_USE_PAGE_LINK_ID = "how-to-use-page-link";
 const STATS_PAGE_LINK_ID = "stats-page-link";
 const STATS_PAGE_LINK_CLASS= "stats-page-links";
