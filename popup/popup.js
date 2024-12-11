@@ -95,18 +95,42 @@ document.getElementById(OPTIONS_PAGE_LINK_ID).addEventListener("click", () => {
  */
 Array.from(document.getElementsByClassName(STATS_PAGE_LINK_CLASS)).forEach(element => {
     element.addEventListener("click", () => {
-    openPage(STATS_PAGE_NAME)
-})})
+        openPage(STATS_PAGE_NAME)
+    })
+})
+/**
+ * Changes 'add timer' button styling and text to match disabled status. 
+ */
+function handleTimerDisabled() {
+    document.getElementById(ADD_TIMER_BTN_ID).classList.add(['dull-buy-btn'])
+    document.getElementById(ADD_TIMER_BTN_ID).disabled = true
+    document.getElementById(ADD_TIMER_BTN_ID).title = "Timer is disabled. Visit the options page to enable it."
+}
+/**
+ * Change UI when timer is enabled.
+ * Change 'add-timer' text to match user reflection period. 
+ * @param {int} timerDuration Time in hours of the timer countdown
+ */
+function handleTimerEnabled(timerDuration) {
+    const timerButtonText = `Yes! Add ${timerDuration} Hour countdown`
+    document.getElementById(ADD_TIMER_BTN_ID).innerText = timerButtonText
+    document.getElementById(ADD_TIMER_BTN_ID).classList.add(['background-brown'])
+
+}
 /**
  * Checks if any active interventions (timers) exist in storage.
  * If a timer exists, it updates the "Add Timer" button's styling to indicate its disabled state.
  */
 function checkActiveInterventions() {
-    chrome.storage.local.get({ timer: true }).then(
+    chrome.storage.local.get({ timer: true, timerDuration: 24 }).then(
         (items) => {
-            if (items.timer == true) {
+            console.log(items)
+            if (items.timer === false) {
+                console.log("changing the information for the user")
                 //TODO: Add message informing user the intervention is disabled
-                document.getElementById(ADD_TIMER_BTN_ID).classList.add(['dull-buy-btn'])
+                handleTimerDisabled()
+            } else {
+                handleTimerEnabled(items.timerDuration)
             }
         }
     );
