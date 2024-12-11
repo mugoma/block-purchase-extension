@@ -1,6 +1,7 @@
 // Time constant representing 24 hours in milliseconds
 const twentyFourHours = 24 * 60 * 60000;
-
+// Time constant representing 1 hour in milliseconds
+const ONE_HOUR_IN_MILLISECONDS = 60 * 60000;
 /**
  * Retrieves the stored time for a given URL from Chrome's local storage.
  *
@@ -34,11 +35,17 @@ function setTimeInStorage(url, time) {
  */
 function resetTimeInStorage(url) {
     return chrome.storage.local.remove(url).then(() => {
-        var currentTime = new Date(Date.now() + twentyFourHours).toString()
-        return setTimeInStorage(url, currentTime)
+        return getTimerDuration().then((timerDuration) => {
+            var currentTime = new Date(Date.now() + timerDuration * ONE_HOUR_IN_MILLISECONDS).toString()
+            return setTimeInStorage(url, currentTime)
+        })
     });
 }
-
+function getTimerDuration() {
+    return chrome.storage.local.get({ timerDuration: 24 }).then((result) => {
+        return result['timerDuration']
+    });
+}
 /**
  * Retrieves the stored time for a given URL or sets a new time (24 hours from now) if none exists.
  *
@@ -48,8 +55,10 @@ function resetTimeInStorage(url) {
 function getOrSetTime(url) {
     return getStoredTime(url).then((storedTime) => {
         if (storedTime == undefined) {
-            var currentTime = new Date(Date.now() + twentyFourHours).toString()
-            return setTimeInStorage(url, currentTime)
+            return getTimerDuration().then((timerDuration) => {
+                var currentTime = new Date(Date.now() + timerDuration * ONE_HOUR_IN_MILLISECONDS).toString()
+                return setTimeInStorage(url, currentTime)
+            })
         };
         return storedTime
     })
