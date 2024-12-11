@@ -10,6 +10,7 @@ const DELETE_TIMER_LINK_ID = "delete-timer-link";
 const OPTIONS_PAGE_LINK_ID = "options-page-link";
 const OPTIONS_PAGE_LINK_CLASS = "options-page-links";
 const HOW_TO_USE_PAGE_LINK_ID = "how-to-use-page-link";
+const HOW_TO_USE_PAGE_LINK_CLASS = "how-to-use-page-links";
 const STATS_PAGE_LINK_ID = "stats-page-link";
 const STATS_PAGE_LINK_CLASS= "stats-page-links";
 const CS_CTA_BTN_ID = "cs_cta_btn"
