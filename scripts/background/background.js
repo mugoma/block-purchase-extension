@@ -15,9 +15,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Handle the action to set a timer
     if (message.action === SET_TIMER_ACTION) {
         console.log("Adding timer!")
-        const url = message.url
+        const [url,price] = [message.url, message.price]
         // Get the existing timer or set a new one if none exists
-        getOrSetTime(url).then((endTime) => { sendResponse(endTime); return endTime })
+        getOrSetTime(url, price).then((endTime) => { sendResponse(endTime); return endTime })
             .then((endTime) => {
                 // Notify the content script that the timer has been set
                 sendMessageToContentScript(url, SET_TIMER_ACTION, endTime, requestInitiator);
@@ -25,9 +25,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Handle the action to reset a timer
     } else if (message.action === RESET_TIMER_ACTION) {
         console.log("Resetting timer!")
-        const url = message.url
+        const [url,price] = [message.url, message.price]
         // Reset the timer in storage and respond with the new end time
-        resetTimeInStorage(url).then((newEndTime) => { sendResponse(newEndTime) }).then((newEndTime) => {
+        resetTimeInStorage(url, price).then((newEndTime) => { sendResponse(newEndTime) }).then((newEndTime) => {
             // Notify the content script that the timer has been reset
             sendMessageToContentScript(url, RESET_TIMER_ACTION, newEndTime, requestInitiator)
         });
@@ -46,8 +46,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const url = message.url
         const wasDeferred = message.wasDeferred
         const timerEndTime = message.timerEndTime
+        const price= message.price
         // Record the purchase deferment and respond once completed
-        recordPurchaseDeferment(url, wasDeferred, timerEndTime).then(() => { sendResponse("Completed") })
+        recordPurchaseDeferment(url, wasDeferred, timerEndTime, price).then(() => { sendResponse("Completed") })
 
     }
     // Indicate that the response will be sent asynchronously

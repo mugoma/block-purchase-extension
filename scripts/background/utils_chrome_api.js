@@ -2,6 +2,9 @@
 const twentyFourHours = 24 * 60 * 60000;
 // Time constant representing 1 hour in milliseconds
 const ONE_HOUR_IN_MILLISECONDS = 60 * 60000;
+//Storage Keys for feedback information
+const DEFERRED_PURCHASES_STORE_KEY = "deferred_purchases";
+const COMPLETED_PURCHASES_STORE_KEY = "completed_purchases";
 /**
  * Retrieves the stored time for a given URL from Chrome's local storage.
  *
@@ -10,7 +13,7 @@ const ONE_HOUR_IN_MILLISECONDS = 60 * 60000;
  */
 function getStoredTime(url) {
     return chrome.storage.local.get(url).then((result) => {
-        return result[url]
+        return result[url] === undefined ? undefined : result[url]['time'];
     });
 }
 /**
@@ -20,10 +23,10 @@ function getStoredTime(url) {
  * @param {string} time - The time to store for the URL.
  * @returns {Promise<string>} A promise that resolves to the stored time.
  */
-function setTimeInStorage(url, time) {
-    var urlTime = {};
-    urlTime[url] = time
-    return chrome.storage.local.set(urlTime).then(() => time);
+function setTimeInStorage(url, time, price) {
+    var urlData = {};
+    urlData[url] = { time: time, amount: price }
+    return chrome.storage.local.set(urlData).then(() => time);
 
 }
 
@@ -33,11 +36,11 @@ function setTimeInStorage(url, time) {
  * @param {string} url - The URL whose timer needs to be reset.
  * @returns {Promise<string>} A promise that resolves to the new stored time.
  */
-function resetTimeInStorage(url) {
+function resetTimeInStorage(url, price) {
     return chrome.storage.local.remove(url).then(() => {
         return getTimerDuration().then((timerDuration) => {
             var currentTime = new Date(Date.now() + timerDuration * ONE_HOUR_IN_MILLISECONDS).toString()
-            return setTimeInStorage(url, currentTime)
+            return setTimeInStorage(url, currentTime, price)
         })
     });
 }
@@ -52,15 +55,15 @@ function getTimerDuration() {
  * @param {string} url - The URL to retrieve or set the stored time for.
  * @returns {Promise<string>} A promise that resolves to the stored or newly set time.
  */
-function getOrSetTime(url) {
+function getOrSetTime(url, price) {
     return getStoredTime(url).then((storedTime) => {
         if (storedTime == undefined) {
             return getTimerDuration().then((timerDuration) => {
                 var currentTime = new Date(Date.now() + timerDuration * ONE_HOUR_IN_MILLISECONDS).toString()
-                return setTimeInStorage(url, currentTime)
+                return setTimeInStorage(url, currentTime, price)
             })
         };
-        return storedTime
+        return storedTime['time']
     })
 }
 /**
@@ -83,7 +86,7 @@ function sendMessageToContentScript(url, action, endTime = null, requestInitiato
  * @param {boolean} wasDeferred - True if the purchase was deferred, false if completed.
  * @returns {Promise<void>} A promise that resolves once the data is recorded.
  */
-function recordPurchaseDeferment(url, wasDeferred, timerEndTime) {
+function recordPurchaseDeferment(url, wasDeferred, timerEndTime, price) {
     var storageKey;
     // Determine the appropriate storage key based on deferment status
     if (wasDeferred === true) {
@@ -103,7 +106,7 @@ function recordPurchaseDeferment(url, wasDeferred, timerEndTime) {
             parsedResult = Array(...JSON.parse(storedResult))
         }
         // Add the URL to the appropriate list
-        parsedResult.unshift({ url: url, timerEndTime: timerEndTime })
+        parsedResult.unshift({ url: url, timerEndTime: timerEndTime, price: price })
         // Store the updated list back to local storage
         const storeValue = {};
         storeValue[storageKey] = JSON.stringify(parsedResult)
