@@ -1,7 +1,10 @@
 // IDs for elements where the purchase lists will be displayed
 const DEFERRED_PURCHASES_LIST_ID = "deferred-purchases-list";
 const COMPLETED_PURCHASES_LIST_ID = "completed-purchases-list";
-
+// IDs for the elements where the general statistics will be displayed
+const COMPLETED_PURCHASES_COUNT_ID = "completed-purchases-count";
+const DEFERRED_PURCHASES_COUNT_ID = "deferred-purchases-count";
+const AMOUNT_SAVED_ID = "amount-saved";
 // Basic Button Styling 
 const BASIC_BUTTON_STYLING = [
     "btn", "background-brown", "text-white"
@@ -15,6 +18,24 @@ let completedPurchases = [];
 let deferredPage = 1;
 let completedPage = 1;
 
+/**
+ * Format a datetime into human-friendly form.
+ * @param {string} dateTime A datetime in string form
+ * @returns {string}
+ */
+function formatStoredTime(dateTime) {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true
+    });
+
+    return formatter.format(new Date(dateTime));
+}
 
 /**
  * Renders a paginated list of purchases in the specified container.
@@ -44,8 +65,9 @@ function renderPaginatedList(purchases, containerId, currentPage) {
     paginatedItems.forEach((storedInfo, index) => {
         const listItem = document.createElement("li");
         const url = storedInfo?.url ? storedInfo.url : storedInfo
-        const timerEndTime = storedInfo?.timerEndTime ? ` | ${storedInfo.timerEndTime}` : ''
-        listItem.textContent = `${startIndex + index + 1}. ${url}${timerEndTime}`;
+        const timerEndTime = storedInfo?.timerEndTime ? ` | ${formatStoredTime(storedInfo.timerEndTime)} | ` : ''
+        const price = storedInfo?.price ? `<span class="text-brown">$${storedInfo.price}</span>` : '';
+        listItem.innerHTML = `${startIndex + index + 1}. ${price}${timerEndTime}${url}`;
         container.appendChild(listItem);
     });
 
@@ -114,6 +136,45 @@ function renderPaginationControls(container, purchases, currentPage, containerId
     }
 }
 
+/**
+ * Renders the total amount saved.
+ * 
+ * @param {Object[]} deferredPurchases - Array of purchase objects with amount properties.
+ * @param {string} containerId - The ID of the container where the total saved amount will be rendered.
+ */
+function renderAmountSaved(deferredPurchases, containerId) {
+    const totalSaved = deferredPurchases.reduce((prev, cur) => {
+        if (cur.price) {
+            return (parseFloat(cur.price) * 100 + prev * 100) / 100;
+        }
+        return prev;
+    }, 0); // Initialize prev to 0
+
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.textContent = `Total Saved: $${totalSaved.toFixed(2)}`;
+    } else {
+        console.error(`Container with ID "${containerId}" not found.`);
+    }
+}
+
+
+/**
+ * Renders the total count of product categories in a specified container.
+ * 
+ * @param {string[]} purchases The full list of purchases
+ * @param {string} containerId The ID for the element which will display 
+ *      the information
+ */
+function renderProductCategoryCount(purchases, containerId) {
+    const containerElement = document.getElementById(containerId);
+
+    if (containerElement) {
+        containerElement.textContent = purchases.length;
+    } else {
+        console.error(`Element with ID '${containerId}' not found.`);
+    }
+}
 // Event listener to run once the DOM content is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
     getStoredPurchases().then(({ deferred, completed }) => {
@@ -124,5 +185,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // Render the deferred and completed purchases with pagination
         renderPaginatedList(deferredPurchases, DEFERRED_PURCHASES_LIST_ID, deferredPage);
         renderPaginatedList(completedPurchases, COMPLETED_PURCHASES_LIST_ID, completedPage);
+        // Add general statistics
+        renderProductCategoryCount(deferredPurchases, DEFERRED_PURCHASES_COUNT_ID);
+        renderProductCategoryCount(completedPurchases, COMPLETED_PURCHASES_COUNT_ID);
+        renderAmountSaved(deferredPurchases, AMOUNT_SAVED_ID)
+
     });
 });

@@ -1,5 +1,15 @@
 // Constant representing 24 hours in milliseconds (24 * 60 minutes * 60,000 milliseconds)
 const twentyFourHours = 24 * 60 * 60000;
+/**
+ * Retrieves the information associated with a given URL from Chrome's local storage. 
+ * @param {string} url The URL used as a key to retrieve the stored time
+ * @returns {Promise<Object>}
+ */
+function getUrlData(url) {
+    return chrome.storage.local.get(url).then((result) => {
+        return result[url]
+    });
+}
 
 /**
  * Retrieves the stored time associated with a given URL from Chrome's local storage.
@@ -9,7 +19,7 @@ const twentyFourHours = 24 * 60 * 60000;
  */
 function getStoredTime(url) {
     return chrome.storage.local.get(url).then((result) => {
-        return result[url]
+        return result[url] === undefined ? undefined : result[url]['time'];
     });
 }
 

@@ -6,6 +6,8 @@ const AMZN_BUY_NOW_ELEM_ID = "submit.buy-now"
 const AMZN_BUY_NOW_BNT_ELEM_ID = "buy-now-button"
 const AMZN_REVIEWS_DIV_ID = "customer-reviews_feature_div"
 const AMZN_STAR_RATING_DIV_ID = "acrPopover";
+const AMZN_PRICE_INPUT_FIELD_ID = 'attach-base-product-price';
+
 // Array of Amazon "Buy" button IDs
 const AMZN_BUY_BTNS_IDS = [AMZN_ADD_TO_CART_ELEM_ID, AMZN_ADD_TO_CART_BNT_ELEM_ID, AMZN_BUY_NOW_ELEM_ID, AMZN_BUY_NOW_BNT_ELEM_ID];
 
@@ -34,7 +36,7 @@ function addExtensionCTACallback() {
             if (ctaBtnHasTimer == 'false') {
                 // Get the current URL to use as a key for storage
                 const url = getCurrentURL()
-                chrome.runtime.sendMessage({ action: 'set-timer', url: url, initiator: 'content-script' }).then((endTime) => {
+                chrome.runtime.sendMessage({ action: 'set-timer', url: url, initiator: 'content-script', price: extractProductPriceFromPage() }).then((endTime) => {
                     // Update the page with timer-related interventions
                     updatePageDOMWithTimerInterventions(AMZN_BUY_BTNS_IDS, [], endTime)
                 })
@@ -110,6 +112,10 @@ function addReducedSocialInfluence() {
         }
     );
     //})
+}
+function extractProductPriceFromPage() {
+    const priceInputElement = document.getElementById(AMZN_PRICE_INPUT_FIELD_ID)
+    return priceInputElement ? priceInputElement.value : 0;
 }
 //TODO: Remove  unhelpful comments
 //document.addEventListener('DOMContentLoaded', () => {

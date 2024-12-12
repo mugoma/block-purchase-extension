@@ -1,21 +1,34 @@
 // Call to check if a timer already exists for the current tab when the script loads
 checkForExistingTimer();
 
+function setTimeUsingBackgroundProcess(action = 'set-timer', url, price) {
+    return chrome.runtime.sendMessage({ action: action, url: url, initiator: 'popup', price: price })
+}
+
 /**
  * Adds a click event listener to the "Add Timer" button.
  * When clicked, it sets a timer for the current tab's URL and updates the DOM with the countdown timer.
  */
 document.getElementById(ADD_TIMER_BTN_ID).addEventListener("click", () => {
-    // Query the currently active tab in the current window
-
-    chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        const url = getCurrentTabUrl(tabs);
+    // Get the current page's url and product price concurrently
+    Promise.all([getCurrentUrl(), getProductPriceFromPage()]).then((results) => {
+        const [url, price] = results
         // Send a message to set a timer and update the DOM with the countdown
-        chrome.runtime.sendMessage({ action: 'set-timer', url: url, initiator: 'popup' }).then((endTime) => {
+        setTimeUsingBackgroundProcess('set-timer', url, price).then((endTime) => {
             updateDOMwithCountDown(endTime)
         })
     });
 })
+/**
+ * Get the url of the tab that is currently open in the browser. 
+ * @returns {Promise<string>}
+ */
+function getCurrentUrl() {
+    return chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+        return getCurrentTabUrl(tabs);
+    })
+}
+
 /**
  * Adds click event listeners to all elements with the "Reset Timer" button class.
  * When clicked, it resets the timer for the current tab's URL, removes the existing timer interval,
@@ -23,18 +36,16 @@ document.getElementById(ADD_TIMER_BTN_ID).addEventListener("click", () => {
  */
 Array.from(document.getElementsByClassName(RESET_TIMER_BTNS_CLASS)).forEach(element => {
     element.addEventListener("click", () => {
-        chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-            const url = getCurrentTabUrl(tabs);
-            // Remove the timer from storage and reset the timer interval
-            //TODO: Remove the duplication
-            chrome.storage.local.remove(url).then(() => {
-                removeExistingTimerInterval();
-                // Send a message to reset the timer and update the DOM with the new countdown
-                chrome.runtime.sendMessage({ action: 'reset-timer', url: url, initiator: 'popup' }).then((endTime) => {
-                    updateDOMwithCountDown(endTime)
-                })
+        // Remove page countdown
+        removeExistingTimerInterval();
+        // Get the current page's url and product price concurrently
+        Promise.all([getCurrentUrl(), getProductPriceFromPage()]).then((results) => {
+            const [url, price] = results
+            // Send a message to reset the timer and update the DOM with the new countdown
+            setTimeUsingBackgroundProcess('reset-timer', url, price).then((endTime) => {
+                updateDOMwithCountDown(endTime)
             })
-        });
+        })
     })
 })
 /**
@@ -46,7 +57,6 @@ document.getElementById(DELETE_TIMER_LINK_ID).addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         var url = getCurrentTabUrl(tabs);
         // Send a message to delete the timer and update the DOM accordingly
-
         chrome.runtime.sendMessage({ action: 'delete-timer', url: url, initiator: 'popup' }).then(() => {
             removeExistingTimerInterval()
             toggleAddTimerContainerVisibility(true);
@@ -62,16 +72,15 @@ document.getElementById(DELETE_TIMER_LINK_ID).addEventListener("click", () => {
  */
 Array.from(document.getElementsByClassName(PURCHASE_FEEDBACK_BTNS_CLASS)).forEach(element => {
     element.addEventListener("click", (event) => {
-        chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-            var url = getCurrentTabUrl(tabs);
-            // TODO: Streamline this logic
+        getCurrentUrl().then((url) => {
             // Determine if the purchase was deferred based on the button's dataset
-            getStoredTime(url).then((timerEndTime) => {
+            getUrlData(url).then((urlData) => {
+                const [timerEndTime, price] = [urlData['time'], urlData['price']]
                 const wasDeferred = event.target.dataset.proceededWithPurchase === "y" ? false : true;
                 chrome.runtime.sendMessage(
                     {
                         action: 'add-purchase-stat', url: url, initiator: 'popup',
-                        wasDeferred: wasDeferred, timerEndTime: timerEndTime
+                        wasDeferred: wasDeferred, timerEndTime: timerEndTime, price: price
                     }).then(() => {
                         // Handle the UI updates after feedback submission
                         handlePostFeedbackSubmission()
@@ -134,6 +143,12 @@ function checkActiveInterventions() {
             }
         }
     );
+}
+function getProductPriceFromPage() {
+    return chrome.tabs.query({ currentWindow: true, active: true }).then((tabs) => {
+        var activeTab = tabs[0];
+        return chrome.tabs.sendMessage(activeTab.id, { action: "get-product-price" }).then((price) => price, () => 0);
+    });
 }
 // Run the `checkActiveInterventions` function when the DOM content is fully loaded
 document.addEventListener('DOMContentLoaded', checkActiveInterventions);

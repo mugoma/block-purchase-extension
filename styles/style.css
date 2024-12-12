@@ -114,3 +114,10 @@
 .text-brown{
     color:brown;
 }
+.stats-card:active, .stats-card:hover, .stats-card:focus{
+    background-color: brown;
+    color:white;
+}
+.stats-card:active *, .stats-card:hover *, .stats-card:focus *{
+    color:white;
+}

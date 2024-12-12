@@ -2,6 +2,7 @@
 const SET_TIMER_ACTION = 'set-timer';        // Action to set a timer
 const RESET_TIMER_ACTION = 'reset-timer';    // Action to reset a timer
 const DELETE_TIMER_ACTION = 'delete-timer';  // Action to delete a timer
+const GET_PRODUCT_PRICE_ACTION = 'get-product-price';  // Action to delete a timer
 /**
  * Listens for messages sent to the background script and performs corresponding actions
  * to update or remove timers on the page based on the received request.
@@ -30,5 +31,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             updatePageDOMWithTimerInterventions(AMZN_BUY_BTNS_IDS, [], endTime)
 
         }
+    } else if (action == GET_PRODUCT_PRICE_ACTION) {
+        sendResponse(extractProductPriceFromPage())
     }
 });

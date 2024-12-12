@@ -241,7 +241,7 @@ function checkForExistingTimer() {
             if (storedTime == undefined) {
                 toggleAddTimerContainerVisibility(true)
             } else {
-                updateDOMwithCountDown(storedTime)
+                updateDOMwithCountDown(storedTime['time'])
             }
         })
     })
