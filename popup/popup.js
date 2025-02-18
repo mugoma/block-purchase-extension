@@ -1,9 +1,19 @@
 // Call to check if a timer already exists for the current tab when the script loads
 checkForExistingTimer();
 
+/**
+ * Sends a message to set/reset a timer using a Chrome extension's 
+ * runtime messaging API to the background process.
+ *
+ * @param {string} action - The action to perform, defaulting to 'set-timer'. Possible actions can be customized.
+ * @param {string} url - The URL associated with the action.
+ * @param {number} price - The price or value associated with the action.
+ * @returns {Promise<any>} - A promise that resolves with the response from the background script.
+ */
 function setTimeUsingBackgroundProcess(action = 'set-timer', url, price) {
-    return chrome.runtime.sendMessage({ action: action, url: url, initiator: 'popup', price: price })
+    return chrome.runtime.sendMessage({ action: action, url: url, initiator: 'popup', price: price });
 }
+
 
 /**
  * Adds a click event listener to the "Add Timer" button.
