@@ -1,3 +1,6 @@
+import { getStoredPurchases, StoredInfo } from "../utils";
+import { addNavbarEventListeners } from "./navbar";
+
 // IDs for elements where the purchase lists will be displayed
 const DEFERRED_PURCHASES_LIST_ID = "deferred-purchases-list";
 const COMPLETED_PURCHASES_LIST_ID = "completed-purchases-list";
@@ -13,17 +16,19 @@ const BASIC_BUTTON_STYLING = [
 const ITEMS_PER_PAGE = 5;
 
 // State for pagination
-let deferredPurchases = [];
-let completedPurchases = [];
+let deferredPurchases: string[] = [];
+let completedPurchases: string[] = [];
 let deferredPage = 1;
 let completedPage = 1;
+
+
 
 /**
  * Format a datetime into human-friendly form.
  * @param {string} dateTime A datetime in string form
  * @returns {string}
  */
-function formatStoredTime(dateTime) {
+function formatStoredTime(dateTime: string | number | Date) {
     const formatter = new Intl.DateTimeFormat('en-US', {
         weekday: "long",
         month: "long",
@@ -44,7 +49,7 @@ function formatStoredTime(dateTime) {
  * @param {string} containerId - The ID of the DOM element where the list will be displayed.
  * @param {number} currentPage - The current page number.
  */
-function renderPaginatedList(purchases, containerId, currentPage) {
+function renderPaginatedList(purchases: any[], containerId: string, currentPage: number) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -54,7 +59,7 @@ function renderPaginatedList(purchases, containerId, currentPage) {
     // Calculate start and end indices for pagination
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const paginatedItems = purchases.slice(startIndex, endIndex);
+    const paginatedItems: Array<StoredInfo> = purchases.slice(startIndex, endIndex);
 
     if (paginatedItems.length === 0) {
         container.innerHTML = "<li>No purchases found.</li>";
@@ -62,7 +67,7 @@ function renderPaginatedList(purchases, containerId, currentPage) {
     }
 
     // Create list items for each purchase URL
-    paginatedItems.forEach((storedInfo, index) => {
+    paginatedItems.forEach((storedInfo: StoredInfo, index: number, array: StoredInfo[]) => {
         const listItem = document.createElement("li");
         const url = storedInfo?.url ? storedInfo.url : storedInfo
         const timerEndTime = storedInfo?.timerEndTime ? ` | ${formatStoredTime(storedInfo.timerEndTime)} | ` : ''
@@ -83,7 +88,7 @@ function renderPaginatedList(purchases, containerId, currentPage) {
  * @param {number} currentPage - The current page number.
  * @param {string} containerId - The ID of the container for context.
  */
-function renderPaginationControls(container, purchases, currentPage, containerId) {
+function renderPaginationControls(container: HTMLElement, purchases: string | any[], currentPage: number, containerId: string) {
     const totalPages = Math.ceil(purchases.length / ITEMS_PER_PAGE);
 
     // Create pagination controls container
@@ -142,8 +147,8 @@ function renderPaginationControls(container, purchases, currentPage, containerId
  * @param {Object[]} deferredPurchases - Array of purchase objects with amount properties.
  * @param {string} containerId - The ID of the container where the total saved amount will be rendered.
  */
-function renderAmountSaved(deferredPurchases, containerId) {
-    const totalSaved = deferredPurchases.reduce((prev, cur) => {
+function renderAmountSaved(deferredPurchases: any[], containerId: string) {
+    const totalSaved = deferredPurchases.reduce((prev: number, cur: { price: string; }) => {
         if (cur.price) {
             return (parseFloat(cur.price) * 100 + prev * 100) / 100;
         }
@@ -166,17 +171,18 @@ function renderAmountSaved(deferredPurchases, containerId) {
  * @param {string} containerId The ID for the element which will display 
  *      the information
  */
-function renderProductCategoryCount(purchases, containerId) {
+function renderProductCategoryCount(purchases: string[], containerId: string) {
     const containerElement = document.getElementById(containerId);
 
-    if (containerElement) {
-        containerElement.textContent = purchases.length;
+    if (containerElement !== null) {
+        containerElement.textContent = purchases.length.toString();
     } else {
         console.error(`Element with ID '${containerId}' not found.`);
     }
 }
 // Event listener to run once the DOM content is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
+    addNavbarEventListeners()
     getStoredPurchases().then(({ deferred, completed }) => {
         // Store the retrieved purchases in global variables
         deferredPurchases = deferred;
@@ -192,3 +198,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 });
+

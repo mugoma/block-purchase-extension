@@ -1,3 +1,4 @@
+import { createInPageCTAElement, getCurrentURL, updatePageDOMIfTimerExists, updatePageDOMWithTimerInterventions } from "../utils";
 // IDs of various Amazon elements used in the extension
 const AMZN_PREV_ELEM_ID = "pmpux_feature_div"
 const AMZN_ADD_TO_CART_ELEM_ID = "submit.add-to-cart"
@@ -9,15 +10,15 @@ const AMZN_STAR_RATING_DIV_ID = "acrPopover";
 const AMZN_PRICE_INPUT_FIELD_ID = 'attach-base-product-price';
 
 // Array of Amazon "Buy" button IDs
-const AMZN_BUY_BTNS_IDS = [AMZN_ADD_TO_CART_ELEM_ID, AMZN_ADD_TO_CART_BNT_ELEM_ID, AMZN_BUY_NOW_ELEM_ID, AMZN_BUY_NOW_BNT_ELEM_ID];
+export const AMZN_BUY_BTNS_IDS = [AMZN_ADD_TO_CART_ELEM_ID, AMZN_ADD_TO_CART_BNT_ELEM_ID, AMZN_BUY_NOW_ELEM_ID, AMZN_BUY_NOW_BNT_ELEM_ID];
 
 /**
  * Adds a Call-to-Action (CTA) button to the Amazon product page.
  * Inserts the button after the element specified by `AMZN_PREV_ELEM_ID`.
  */
-function addExtensionCTA() {
+function addAmazonPageCTA() {
     const prevElem = document.getElementById(AMZN_PREV_ELEM_ID);
-    if (prevElem !== null) {
+    if (prevElem !== null && prevElem.parentNode !== null) {
         // Insert the CTA button after the specified element
         prevElem.parentNode.insertBefore(createInPageCTAElement(), prevElem.nextSibling);
     }
@@ -27,7 +28,7 @@ function addExtensionCTA() {
  * Adds a click event listener to the CTA button.
  * When clicked, it sets a timer and updates the page DOM if no timer exists.
  */
-function addExtensionCTACallback() {
+function addAmazonPageCTACallback() {
     const ctaBtn = document.getElementById("cs_cta_btn");
     if (ctaBtn !== null) {
         ctaBtn.addEventListener("click", (e) => {
@@ -41,7 +42,7 @@ function addExtensionCTACallback() {
                     updatePageDOMWithTimerInterventions(AMZN_BUY_BTNS_IDS, [], endTime)
                 })
                 // Set the attribute to indicate a timer has been set
-                ctaBtn.setAttribute('data-has-timer', true)
+                ctaBtn.setAttribute('data-has-timer', 'true')
             } else {
                 //TODO: Add link to 'product' page
             }
@@ -54,7 +55,7 @@ function addExtensionCTACallback() {
  *
  * @param {HTMLElement} targetDiv - The target div element to apply the overlay to.
  */
-function generateOverLayElement(targetDiv) {
+function generateOverLayElement(targetDiv: HTMLElement) {
     // Get the star rating text from the star rating element
     const starRating = document.getElementById(AMZN_STAR_RATING_DIV_ID)?.innerText
 
@@ -84,10 +85,14 @@ function generateOverLayElement(targetDiv) {
     // Add click event to remove the overlay and blur effect
     spoilerOverlay.addEventListener('click', function () {
         this.classList.add('display-none')// Hides the overlay
-        this.parentElement.classList.add('spoiler-container-unblurred') // Removes the blur effect on the text
+        if (this.parentElement !== null) {
+            this.parentElement.classList.remove(...['spoiler-container-blurred']) // Removes the blur effect on the text
+        }
     });
     // Insert the spoiler container before the target div and append the target div to it
-    targetDiv.parentNode.insertBefore(spoilerContainerDiv, targetDiv);
+    if (targetDiv.parentNode !== null) {
+        targetDiv.parentNode.insertBefore(spoilerContainerDiv, targetDiv);
+    }
     spoilerContainerDiv.appendChild(targetDiv);
 }
 /**
@@ -113,21 +118,19 @@ function addReducedSocialInfluence() {
     );
     //})
 }
-function extractProductPriceFromPage() {
+export function extractProductPriceFromPage() {
     const priceInputElement = document.getElementById(AMZN_PRICE_INPUT_FIELD_ID)
-    return priceInputElement ? priceInputElement.value : 0;
+    return priceInputElement ? (priceInputElement as HTMLInputElement).value : 0;
 }
 //TODO: Remove  unhelpful comments
 //document.addEventListener('DOMContentLoaded', () => {
 console.log("I'll try to add stuff to the page!")
 // Add the extension's CTA button to the page
-addExtensionCTA();
+addAmazonPageCTA();
 // Update the page DOM if a timer already exists for the current URL
 updatePageDOMIfTimerExists(AMZN_BUY_BTNS_IDS, []);
 // Add click event listener to the CTA button
-addExtensionCTACallback();
-// Set up any necessary event listeners for incoming messages
-setEventListenerForMessages();
+addAmazonPageCTACallback();
 // Apply reduced social influence by overlaying reviews if applicable
 addReducedSocialInfluence();
 //});

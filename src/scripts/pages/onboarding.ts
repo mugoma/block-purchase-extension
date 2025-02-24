@@ -1,3 +1,6 @@
+import { OPTIONS_PAGE_LINK_CLASS, openOptionsPage, HOW_TO_USE_PAGE_LINK_CLASS, openPage, HOW_TO_USE_PAGE_NAME } from "../utils";
+import { addNavbarEventListeners } from "./navbar";
+
 /**
  * Adds a click event listener to the "Options Page" link.
  * When clicked, it opens the extension's options page.
@@ -16,3 +19,4 @@ Array.from(document.getElementsByClassName(HOW_TO_USE_PAGE_LINK_CLASS)).forEach(
         openPage(HOW_TO_USE_PAGE_NAME)
     })
 })
+addNavbarEventListeners()

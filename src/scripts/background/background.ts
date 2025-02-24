@@ -1,5 +1,5 @@
 // Import utility functions from the utils_chrome_api module
-import { getOrSetTime, resetTimeInStorage, sendMessageToContentScript, recordPurchaseDeferment } from "./utils_chrome_api.js";
+import { getOrSetTime, resetTimeInStorage, sendMessageToContentScript, recordPurchaseDeferment } from "../utils_chrome_api";
 // Message Actions (constants representing various actions that can be handled)
 const SET_TIMER_ACTION = 'set-timer';
 const RESET_TIMER_ACTION = 'reset-timer';
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Handle the action to set a timer
     if (message.action === SET_TIMER_ACTION) {
         console.log("Adding timer!")
-        const [url,price] = [message.url, message.price]
+        const [url, price] = [message.url, message.price]
         // Get the existing timer or set a new one if none exists
         getOrSetTime(url, price).then((endTime) => { sendResponse(endTime); return endTime })
             .then((endTime) => {
@@ -25,9 +25,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Handle the action to reset a timer
     } else if (message.action === RESET_TIMER_ACTION) {
         console.log("Resetting timer!")
-        const [url,price] = [message.url, message.price]
+        const [url, price] = [message.url, message.price]
         // Reset the timer in storage and respond with the new end time
-        resetTimeInStorage(url, price).then((newEndTime) => { sendResponse(newEndTime) }).then((newEndTime) => {
+        resetTimeInStorage(url, price).then((newEndTime: string) => { sendResponse(newEndTime); return newEndTime }).then((newEndTime: string) => {
             // Notify the content script that the timer has been reset
             sendMessageToContentScript(url, RESET_TIMER_ACTION, newEndTime, requestInitiator)
         });
@@ -46,7 +46,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const url = message.url
         const wasDeferred = message.wasDeferred
         const timerEndTime = message.timerEndTime
-        const price= message.price
+        const price = message.price
         // Record the purchase deferment and respond once completed
         recordPurchaseDeferment(url, wasDeferred, timerEndTime, price).then(() => { sendResponse("Completed") })
 

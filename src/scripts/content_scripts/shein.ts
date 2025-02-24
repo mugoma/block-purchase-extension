@@ -1,3 +1,5 @@
+import { createInPageCTAElement, getCurrentURL, updatePageDOMWithTimerInterventions, updatePageDOMIfTimerExists } from "../utils";
+
 // IDs and Classes for various SHEIN elements used in the extension
 const SHEIN_PREV_ELEM_ID = "productIntroPrice"
 //const SHEIN_ADD_TO_CART_ELEM_ID = "submit.add-to-cart"
@@ -17,12 +19,14 @@ const SHEIN_BUY_BTNS_IDS = [
  * Adds a Call-to-Action (CTA) button to the SHEIN product page.
  * Inserts the button after the element specified by `SHEIN_PREV_ELEM_ID`.
  */
-function addExtensionCTA() {
+function addSheinPageCTA() {
     const prevElem = document.getElementById(SHEIN_PREV_ELEM_ID);
     if (prevElem !== null) {
         // Insert the CTA button after the specified element
 
-        prevElem.parentNode.insertBefore(createInPageCTAElement(), prevElem.nextSibling);
+        if (prevElem.parentNode !== null) {
+            prevElem.parentNode.insertBefore(createInPageCTAElement(), prevElem.nextSibling);
+        }
     }
 }
 
@@ -30,7 +34,7 @@ function addExtensionCTA() {
  * Adds a click event listener to the CTA button.
  * When clicked, it sets a timer and updates the page DOM if no timer exists.
  */
-function addExtensionCTACallback() {
+function addSheinPageCTACallback() {
     const ctaBtn = document.getElementById("cs_cta_btn");
     if (ctaBtn !== null) {
         ctaBtn.addEventListener("click", (e) => {
@@ -46,7 +50,7 @@ function addExtensionCTACallback() {
                 })
                 // Set the attribute to indicate a timer has been set
 
-                ctaBtn.setAttribute('data-has-timer', true)
+                ctaBtn.setAttribute('data-has-timer', 'true')
             } else {
                 //TODO: Add link to 'product' page
             }
@@ -59,7 +63,7 @@ function addExtensionCTACallback() {
  *
  * @param {HTMLElement} targetDiv - The target div element to apply the overlay to.
  */
-function generateOverLayElement(targetDiv) {
+function generateOverLayElement(targetDiv: Element) {
     // Get the star rating text from the star rating element
 
     const starRating = document.getElementById(SHEIN_STAR_RATING_DIV_ID)?.innerText
@@ -89,11 +93,15 @@ function generateOverLayElement(targetDiv) {
     // Add click event to remove the overlay and blur effect
     spoilerOverlay.addEventListener('click', function () {
         this.classList.add('display-none')//.display = 'none'; // Hides the overlay
-        this.parentElement.classList.add('spoiler-container-unblurred')//this.nextElementSibling.style.filter = 'none'; // Removes the blur effect on the text
-        this.parentElement.classList.remove('spoiler-container-blurred')//this.nextElementSibling.style.filter = 'none'; // Removes the blur effect on the text
+        if (this.parentElement !== null) {
+            this.parentElement.classList.add('spoiler-container-unblurred');
+            this.parentElement.classList.remove('spoiler-container-blurred')
+        }
     });
     // Insert the spoiler container before the target div and append the target div to it
-    targetDiv.parentNode.insertBefore(spoilerContainerDiv, targetDiv);
+    if (targetDiv.parentNode !== null) {
+        targetDiv.parentNode.insertBefore(spoilerContainerDiv, targetDiv);
+    }
     spoilerContainerDiv.appendChild(targetDiv);
 }
 
@@ -102,7 +110,7 @@ function generateOverLayElement(targetDiv) {
  *
  * @param {string} reviewsDivId - The class name of the reviews container.
  */
-function addOverlayToReviews(reviewsDivId) {
+function addOverlayToReviews(reviewsDivId: string) {
     const reviewsDiv = document.getElementsByClassName(reviewsDivId)
     if (reviewsDiv.length > 0) {
         console.log(reviewsDiv.length + " is the length")
@@ -117,7 +125,7 @@ function addOverlayToReviews(reviewsDivId) {
  *
  * @param {string} reviewsDivId - The class name of the reviews container.
  */
-function addReducedSocialInfluence(reviewsDivId) {
+function addReducedSocialInfluence(reviewsDivId: string) {
     chrome.storage.local.get({ reviews: true }).then(
         (items) => {
             if (items.reviews == true) {
@@ -132,7 +140,7 @@ function addReducedSocialInfluence(reviewsDivId) {
  * @param {string} name - The ID of the element to check for.
  * @param {Function} callback - The function to execute when the element is available.
  */
-function whenAvailable(name, callback) {
+function whenAvailable(name: string, callback: { (): void; (): void; }) {
     var interval = 10; // ms
     window.setTimeout(function () {
         if (document.getElementById(name) !== null) {
@@ -149,7 +157,7 @@ function whenAvailable(name, callback) {
  * @param {string} name - The class name of the element to check for.
  * @param {Function} callback - The function to execute when the element is available.
  */
-function whenAvailable2(name, callback) {
+function whenAvailable2(name: string, callback: { (): void; (): void; }) {
     var interval = 10; // ms
     window.setTimeout(function () {
         if (document.getElementsByClassName(name).length > 0) {
@@ -168,12 +176,10 @@ whenAvailable(SHEIN_PREV_ELEM_ID, () => {
     //     addExtensionCTACallback();
     // } else {
     // document.addEventListener('DOMContentLoaded', () => {
-    addExtensionCTA();
+    addSheinPageCTA();
     updatePageDOMIfTimerExists(SHEIN_BUY_BTNS_IDS, []);
-    addExtensionCTACallback();
+    addSheinPageCTACallback();
 })
-// Set up event listeners for messages from the background script
-setEventListenerForMessages();
 // Add reduced social influence functionality when the reviews section is available
 whenAvailable2(SHEIN_REVIEWS_DIV_CLASS, () => {
     addReducedSocialInfluence(SHEIN_REVIEWS_DIV_CLASS);

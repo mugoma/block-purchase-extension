@@ -1,3 +1,6 @@
+import { openOptionsPage, openPage, OPTIONS_PAGE_LINK_CLASS, OPTIONS_PAGE_LINK_ID, STATS_PAGE_LINK_CLASS, STATS_PAGE_NAME } from "../utils";
+import { addNavbarEventListeners } from "./navbar";
+
 // Add a click event listener to the element with the ID stored in OPTIONS_PAGE_LINK_ID.
 document.getElementById(OPTIONS_PAGE_LINK_ID)?.addEventListener("click", () => {
     openOptionsPage();
@@ -21,3 +24,4 @@ Array.from(document.getElementsByClassName(OPTIONS_PAGE_LINK_CLASS)).forEach(ele
         openOptionsPage()
     })
 })
+addNavbarEventListeners()
