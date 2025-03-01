@@ -27,7 +27,7 @@ jobs:
 
       - name: Check for uncommitted changes in block-purchase-extension-chrome-store-version/
         run: |
-          git add build
+          git add block-purchase-extension-chrome-store-version
           if ! git diff --cached --exit-code; then
             echo "Build directory has uncommitted changes! Ensure 'npm run build:chrome-store' is run and committed."
             exit 1
