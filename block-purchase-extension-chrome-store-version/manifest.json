@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Block Purchase",
+  "description": "Block the immediate purchase of products",
+  "version": "1.1",
+  "action": {
+    "default_popup": "pages/popup.html"
+  },
+  "options_page": "pages/options.html",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "scripts/background/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.amazon.com/*"
+      ],
+      "js": [
+        "scripts/content_scripts/amazon.js"
+      ],
+      "css": [
+        "styles/style.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://*.amazon.com/cart/*"
+      ],
+      "js": [
+        "scripts/content_scripts/amazon_cart.js"
+      ],
+      "css": [
+        "styles/style.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://*.shein.com/*"
+      ],
+      "js": [
+        "scripts/content_scripts/shein.js",
+        "scripts/content_scripts/messageListener.js"
+      ],
+      "css": [
+        "styles/style.css"
+      ]
+    }
+  ],
+  "web_accessible_resources": []
+}
