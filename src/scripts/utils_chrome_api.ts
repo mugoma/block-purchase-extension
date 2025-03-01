@@ -1,10 +1,12 @@
+import { DEFERRED_PURCHASES_STORE_KEY, COMPLETED_PURCHASES_STORE_KEY } from "./constants";
+
 // Time constant representing 24 hours in milliseconds
 const twentyFourHours = 24 * 60 * 60000;
 // Time constant representing 1 hour in milliseconds
 const ONE_HOUR_IN_MILLISECONDS = 60 * 60000;
 //Storage Keys for feedback information
-const DEFERRED_PURCHASES_STORE_KEY:string = "deferred_purchases";
-const COMPLETED_PURCHASES_STORE_KEY:string = "completed_purchases";
+// const DEFERRED_PURCHASES_STORE_KEY:string = "deferred_purchases";
+// const COMPLETED_PURCHASES_STORE_KEY:string = "completed_purchases";
 
 /**
  * Retrieves the information associated with a given URL from Chrome's local storage. 

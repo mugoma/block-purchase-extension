@@ -21,8 +21,7 @@
         "https://*.amazon.com/*"
       ],
       "js": [
-        "scripts/content_scripts/amazon.js",
-        "scripts/content_scripts/messageListener.js"
+        "scripts/content_scripts/amazon.js"
       ],
       "css": [
         "styles/style.css"

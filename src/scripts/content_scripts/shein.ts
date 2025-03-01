@@ -1,3 +1,4 @@
+import { SET_TIMER_ACTION } from "../constants";
 import { createInPageCTAElement, getCurrentURL, updatePageDOMWithTimerInterventions, updatePageDOMIfTimerExists } from "../utils";
 
 // IDs and Classes for various SHEIN elements used in the extension
@@ -43,7 +44,7 @@ function addSheinPageCTACallback() {
             if (ctaBtnHasTimer == 'false') {
                 // Get the current URL to use as a key for storage
                 const url = getCurrentURL()
-                chrome.runtime.sendMessage({ action: 'set-timer', url: url, initiator: 'content-script' }).then((endTime) => {
+                chrome.runtime.sendMessage({ action: SET_TIMER_ACTION, url: url, initiator: 'content-script' }).then((endTime) => {
                     // Update the page with timer-related interventions
 
                     updatePageDOMWithTimerInterventions(SHEIN_BUY_BTNS_IDS, [], endTime)
@@ -113,10 +114,8 @@ function generateOverLayElement(targetDiv: Element) {
 function addOverlayToReviews(reviewsDivId: string) {
     const reviewsDiv = document.getElementsByClassName(reviewsDivId)
     if (reviewsDiv.length > 0) {
-        console.log(reviewsDiv.length + " is the length")
         generateOverLayElement(reviewsDiv[0])
     } else {
-        console.log("WHAT IS HAPPENING!")
     }
 }
 
