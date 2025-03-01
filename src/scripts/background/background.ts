@@ -1,10 +1,7 @@
 // Import utility functions from the utils_chrome_api module
+import { SET_TIMER_ACTION, RESET_TIMER_ACTION, DELETE_TIMER_ACTION, ADD_PURCHASE_TIMER_STAT_ACTION } from "../constants";
 import { getOrSetTime, resetTimeInStorage, sendMessageToContentScript, recordPurchaseDeferment } from "../utils_chrome_api";
 // Message Actions (constants representing various actions that can be handled)
-const SET_TIMER_ACTION = 'set-timer';
-const RESET_TIMER_ACTION = 'reset-timer';
-const DELETE_TIMER_ACTION = 'delete-timer';
-const ADD_PURCHASE_TIMER_STAT = 'add-purchase-stat';
 /**
  * Listens for messages from other parts of the Chrome extension (such as content scripts).
  * Based on the action specified in the message, it performs the corresponding task.
@@ -14,7 +11,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const requestInitiator = message.initiator
     // Handle the action to set a timer
     if (message.action === SET_TIMER_ACTION) {
-        console.log("Adding timer!")
         const [url, price] = [message.url, message.price]
         // Get the existing timer or set a new one if none exists
         getOrSetTime(url, price).then((endTime) => { sendResponse(endTime); return endTime })
@@ -24,7 +20,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
         // Handle the action to reset a timer
     } else if (message.action === RESET_TIMER_ACTION) {
-        console.log("Resetting timer!")
         const [url, price] = [message.url, message.price]
         // Reset the timer in storage and respond with the new end time
         resetTimeInStorage(url, price).then((newEndTime: string) => { sendResponse(newEndTime); return newEndTime }).then((newEndTime: string) => {
@@ -38,11 +33,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Remove the timer associated with the URL from local storage
         chrome.storage.local.remove(url);
         sendResponse("Deleted")
-        console.log("Deleting timer!")
         //Send to content script
         sendMessageToContentScript(url, DELETE_TIMER_ACTION, null, requestInitiator);
         // Handle the action to record a purchase deferment statistic
-    } else if (message.action === ADD_PURCHASE_TIMER_STAT) {
+    } else if (message.action === ADD_PURCHASE_TIMER_STAT_ACTION) {
         const url = message.url
         const wasDeferred = message.wasDeferred
         const timerEndTime = message.timerEndTime

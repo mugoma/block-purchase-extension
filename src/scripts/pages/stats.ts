@@ -8,6 +8,7 @@ const COMPLETED_PURCHASES_LIST_ID = "completed-purchases-list";
 const COMPLETED_PURCHASES_COUNT_ID = "completed-purchases-count";
 const DEFERRED_PURCHASES_COUNT_ID = "deferred-purchases-count";
 const AMOUNT_SAVED_ID = "amount-saved";
+const UNIQUE_AMOUNT_SAVED_ID = "unique-amount-saved";
 // Basic Button Styling 
 const BASIC_BUTTON_STYLING = [
     "btn", "background-brown", "text-white"
@@ -70,7 +71,7 @@ function renderPaginatedList(purchases: any[], containerId: string, currentPage:
     paginatedItems.forEach((storedInfo: StoredInfo, index: number, array: StoredInfo[]) => {
         const listItem = document.createElement("li");
         const url = storedInfo?.url ? storedInfo.url : storedInfo
-        const timerEndTime = storedInfo?.timerEndTime ? ` | ${formatStoredTime(storedInfo.timerEndTime)} | ` : ''
+        const timerEndTime = storedInfo?.time ? ` | ${formatStoredTime(storedInfo.time)} | ` : ''
         const price = storedInfo?.price ? `<span class="text-brown">$${storedInfo.price}</span>` : '';
         listItem.innerHTML = `${startIndex + index + 1}. ${price}${timerEndTime}${url}`;
         container.appendChild(listItem);
@@ -162,6 +163,41 @@ function renderAmountSaved(deferredPurchases: any[], containerId: string) {
         console.error(`Container with ID "${containerId}" not found.`);
     }
 }
+function renderUniqueAmountSaved(deferredPurchases: any[], containerId: string) {
+    const aggregatedPurchases: Record<string, { price: number, count: number }> = {};
+
+    // Aggregate price values for each key
+    for (const key in deferredPurchases) {
+        if (deferredPurchases.hasOwnProperty(key)) {
+            const { price, url } = deferredPurchases[key];
+
+            if (!aggregatedPurchases[url]) {
+                aggregatedPurchases[url] = { price, count: 1 };
+            } else {
+                aggregatedPurchases[url].price = (parseFloat(aggregatedPurchases[url].price.toString()) * 100 + parseFloat(price.toString()) * 100) / 100;
+                aggregatedPurchases[url].count += 1;
+            }
+        }
+    }
+    console.log(aggregatedPurchases)
+    // Compute average price per unique key
+    const uniqueDeferredPurchases: Record<string, { price: number }> = {};
+    for (const key in aggregatedPurchases) {
+        if (aggregatedPurchases.hasOwnProperty(key)) {
+            uniqueDeferredPurchases[key] = { price: aggregatedPurchases[key].price / aggregatedPurchases[key].count };
+        }
+    }
+
+    // Calculate total unique saved amount
+    const totalUniqueSaved = Object.values(uniqueDeferredPurchases).reduce((prev, cur) => prev + cur.price, 0);
+
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.textContent = `Total Unique Saved: $${totalUniqueSaved.toFixed(2)}`;
+    } else {
+        console.error(`Container with ID "${containerId}" not found.`);
+    }
+}
 
 
 /**
@@ -195,6 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderProductCategoryCount(deferredPurchases, DEFERRED_PURCHASES_COUNT_ID);
         renderProductCategoryCount(completedPurchases, COMPLETED_PURCHASES_COUNT_ID);
         renderAmountSaved(deferredPurchases, AMOUNT_SAVED_ID)
+        renderUniqueAmountSaved(deferredPurchases, UNIQUE_AMOUNT_SAVED_ID)
 
     });
 });

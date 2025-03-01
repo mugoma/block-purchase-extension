@@ -5,7 +5,7 @@ addNavbarEventListeners()
  * Saves the options for the timer and reviews settings to Chrome's local storage.
  * Updates the user interface to indicate that the options were successfully saved.
  */
-const saveOptions = () => {
+export const saveOptions = () => {
     // Retrieve the state of the 'timer' and 'reviews' checkboxes
 
     const timerElement = document.getElementById('timer') as HTMLInputElement;
@@ -35,7 +35,7 @@ const saveOptions = () => {
  * Restores the saved options for the timer and reviews settings from Chrome's local storage.
  * Updates the checkbox states in the user interface based on the saved values.
  */
-const restoreOptions = () => {
+export const restoreOptions = () => {
     // Get the stored options from Chrome's local storage (default to true if not set)
     chrome.storage.local.get({ timer: true, reviews: true, timerDuration: 24 }).then(
         (items) => {

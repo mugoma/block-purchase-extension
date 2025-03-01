@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot Test for popup.html HTML structure matches the snapshot 1`] = `
+"
+  <div class="body-container">
+    <h1 class="text-center">Block Purchase</h1>
+    <div id="add-timer-container" class="cls-hidden">
+      <p id="popup-text" class="text-center">Do you want to add a timer to the product on this page?</p>
+      <div class="d-flex justify-content-center">
+        <button id="add-timer-btn" class="btn text-white btn-large text-center">Yes! Add 24 Hour
+          countdown</button>
+      </div>
+    </div>
+    <div id="existing-timer-container" class="cls-hidden">
+      <div id="countdown-timer" class="text-center countdown"></div>
+      <div class="d-flex justify-content-center p-3">
+        <button class="reset-timer-btn btn background-brown text-white btn-large text-center">Restart
+          Timer</button>
+      </div>
+      <div class="text-center">
+        <a href="#" id="delete-timer-link">Delete Timer</a>
+      </div>
+    </div>
+    <div id="completed-timer-container" class="cls-hidden">
+      <h2 class="text-center">Time's Up</h2>
+      <div id="completed-timer-ask-feedback">
+        <p>Your 24 hours are done! Are you still interested in buying this product?</p>
+        <div id="completed-timer-feedback-btns" class="d-flex justify-content-between p-3">
+          <button class="purchase-feedback btn background-red text-white btn-large text-center" data-proceeded-with-purchase="y">Yes</button>
+          <button class="purchase-feedback btn background-blue text-white btn-large text-center" data-proceeded-with-purchase="n">No</button>
+        </div>
+      </div>
+      <div id="completed-timer-completed-feedback" class="cls-hidden">
+        <p>Thank you for your feedback. You can check your statistics <a href="#" class="stats-page-links">here</a>.</p>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-center p-3">
+        <button class="reset-timer-btn btn background-brown text-white btn-large text-center">Restart
+          Timer</button>
+      </div>
+
+    </div>
+    <div class="options-container text-center">
+      <a href="#" id="options-page-link">Options</a>
+    </div>
+    <div class="options-container text-center">
+      <a href="#" class="stats-page-links">My Stats</a>
+    </div>
+  </div>
+  <script src="../scripts/pages/popup.js"></script>
+
+
+"
+`;

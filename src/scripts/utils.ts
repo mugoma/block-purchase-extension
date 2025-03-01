@@ -1,5 +1,8 @@
+import { COMPLETED_PURCHASES_STORE_KEY, DEFERRED_PURCHASES_STORE_KEY, GET_PRODUCT_PRICE_ACTION } from "./constants";
 import { getStoredTime } from "./utils_chrome_api";
+
 var intervalId: string | number | NodeJS.Timeout | undefined;
+var CTAIntervalId: string | number | NodeJS.Timeout | undefined;
 // HTML Element variables
 const COUNTDOWN_ELEMENT_ID = "countdown-timer";
 export const RESET_TIMER_BTNS_CLASS = "reset-timer-btn";
@@ -14,7 +17,7 @@ export const HOW_TO_USE_PAGE_LINK_ID = "how-to-use-page-link";
 export const HOW_TO_USE_PAGE_LINK_CLASS = "how-to-use-page-links";
 export const STATS_PAGE_LINK_ID = "stats-page-link";
 export const STATS_PAGE_LINK_CLASS = "stats-page-links";
-const CS_CTA_BTN_ID = "cs_cta_btn"
+export const CS_CTA_BTN_ID = "cs_cta_btn"
 const COMPLETED_TIMER_CONTAINER_ID = "completed-timer-container";
 const HIDDEN_CLASS = "cls-hidden";
 export const PURCHASE_FEEDBACK_BTNS_CLASS = "purchase-feedback";
@@ -22,10 +25,11 @@ const ASK_FEEDBACK_SECTION_ID = "completed-timer-ask-feedback";
 const FEEDBACK_COMPLETED_SECTION_ID = "completed-timer-completed-feedback";
 export const STATS_PAGE_NAME = "my-statistics.html";
 export const HOW_TO_USE_PAGE_NAME = "how-to-use.html";
+export const CTA_BUTTON_TEXT = "Start Timer"
 //const VISIBLE_CLASS="cls-visible";
-// Constants for Chrome storage keys
-const DEFERRED_PURCHASES_STORE_KEY = "deferred_purchases";
-const COMPLETED_PURCHASES_STORE_KEY = "completed_purchases";
+
+const AMZN_PRICE_INPUT_FIELD_ID = 'attach-base-product-price';
+
 /**
  * Creates a Call-to-Action (CTA) button element within a container div.
  * The button is styled and set to start a timer when clicked.
@@ -38,12 +42,12 @@ export function createInPageCTAElement() {
     // Button
     const ctaButton = document.createElement("button");
     ctaButton.classList.add('btn', 'btn-pill', 'background-brown', 'text-white', 'text-center');
-    ctaButton.innerHTML = "Start Timer"
     //Image
     //const ctaButtonImg = document.createElement("img");
     //ctaButtonImg.setAttribute("src", hourglassImageURL)
     ctaButton.setAttribute("id", CS_CTA_BTN_ID)
     ctaButton.setAttribute("data-has-timer", 'false')
+    ctaButton.setAttribute("title", "You can cancel the timer from the extension popup.")
 
     //ctaButton.appendChild(ctaButtonImg)
     ctaDiv.appendChild(ctaButton)
@@ -59,7 +63,7 @@ export function createInPageCTAElement() {
  * @param {Array<string>} newCSSClassesToAdd - An array of CSS classes to add to the button.
  */
 
-function changeBuyButtonStyling(buyButtonId:string, endTime:string|number|Date, cssClassesToRemove: string[] = [], newCSSClassesToAdd = ['dull-buy-btn']) {
+function changeBuyButtonStyling(buyButtonId: string, endTime: string | number | Date, cssClassesToRemove: string[] = [], newCSSClassesToAdd = ['dull-buy-btn']) {
     const buyButtonElem = document.getElementById(buyButtonId);
     if (buyButtonElem != null) {
         // Make the button gray with white text
@@ -80,7 +84,7 @@ function changeBuyButtonStyling(buyButtonId:string, endTime:string|number|Date, 
  * @param {Array<string>} cssClassesToRestore - An array of CSS classes to restore on the button.
  * @param {Array<string>} cssClassesToRemove - An array of CSS classes to remove from the button.
  */
-function revertBuyButtonStyling(buyButtonId:string, cssClassesToRestore:string[] = [], cssClassesToRemove:string[] = ['dull-buy-btn']) {
+function revertBuyButtonStyling(buyButtonId: string, cssClassesToRestore: string[] = [], cssClassesToRemove: string[] = ['dull-buy-btn']) {
     const buyButtonElem = document.getElementById(buyButtonId);
     if (buyButtonElem != null) {
         // Make the button gray with white text
@@ -103,7 +107,7 @@ function revertBuyButtonStyling(buyButtonId:string, cssClassesToRestore:string[]
  * @param {boolean} showSeconds - Whether to show seconds in the countdown timer.
  * @returns {boolean} Returns true if the timer was successfully created, otherwise false.
  */
-function createCountdownTimer(targetDate:string|Date|number, elementId:string, timerPreText = '', showSeconds = true) {
+function createCountdownTimer(targetDate: string | Date | number, elementId: string, timerPreText = '', showSeconds = true) {
     const timeUnit = showSeconds == true ? 1000 : 1000 * 60;
     // Get the target date and time in milliseconds
     const targetTime = new Date(targetDate).getTime();
@@ -147,14 +151,14 @@ function createCountdownTimer(targetDate:string|Date|number, elementId:string, t
 
         // Check if the countdown has ended
         if (difference <= 0) {
-            clearInterval(intervalId);
+            clearInterval(CTAIntervalId);
             toggleExistingTimerContainerVisibility(false);
             toggleCompletedTimerContainerVisibility(true);
             //document.getElementById(elementId).innerHTML = "Time's up!";
         }
     };
     // Start the countdown timer with an interval of 1 second
-    intervalId = setInterval(updateTimer, timeUnit);
+    CTAIntervalId = setInterval(updateTimer, timeUnit);
     return true;
 }
 
@@ -164,7 +168,7 @@ function createCountdownTimer(targetDate:string|Date|number, elementId:string, t
  * @param {Array} tabs - An array of tab objects.
  * @returns {string|undefined} The URL of the current tab, or undefined if not found.
  */
-export function getCurrentTabUrl(tabs:Array<any>) {
+export function getCurrentTabUrl(tabs: Array<any>) {
     if (tabs && tabs.length > 0) {
         const url = tabs[0].url;
         return url
@@ -191,7 +195,7 @@ function addSuccessMessage() {
  * @param {boolean} isVisible - Whether the element should be visible.
  * @param {HTMLElement|null} elem - The element to toggle visibility for.
  */
-function toggleElementVisibility(isVisible:boolean, elem:HTMLElement|null) {
+function toggleElementVisibility(isVisible: boolean, elem: HTMLElement | null) {
     if (elem !== null) {
         if (isVisible === true) {
             elem.classList.remove(CSS_HIDDEN_CLASS)
@@ -205,7 +209,7 @@ function toggleElementVisibility(isVisible:boolean, elem:HTMLElement|null) {
  *
  * @param {boolean} isVisible - Whether the container should be visible.
  */
-export function toggleAddTimerContainerVisibility(isVisible:boolean) {
+export function toggleAddTimerContainerVisibility(isVisible: boolean) {
     const addTimerContainerElem = document.getElementById(ADD_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, addTimerContainerElem)
 }
@@ -231,7 +235,7 @@ export function checkForExistingTimer() {
  * @param {number|string|Date} timeForCountdown - The time to count down to.
  * @param {boolean} showSeconds - Whether to show seconds in the countdown.
  */
-export function updateDOMwithCountDown(timeForCountdown:number|string|Date, showSeconds = true) {
+export function updateDOMwithCountDown(timeForCountdown: number | string | Date, showSeconds = true) {
     toggleAddTimerContainerVisibility(false)
     var started_timer = createCountdownTimer(new Date(timeForCountdown), COUNTDOWN_ELEMENT_ID, "Time left: ", showSeconds);
     if (started_timer === true) {
@@ -255,7 +259,7 @@ export function updateDOMwithCountDown(timeForCountdown:number|string|Date, show
  * @param {boolean} isVisible - Whether the container should be visible.
  */
 
-export function toggleExistingTimerContainerVisibility(isVisible:boolean) {
+export function toggleExistingTimerContainerVisibility(isVisible: boolean) {
     const existingTimerContainerElem = document.getElementById(EXISTING_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, existingTimerContainerElem)
 }
@@ -265,7 +269,7 @@ export function toggleExistingTimerContainerVisibility(isVisible:boolean) {
  * @param {boolean} isVisible - Whether the container should be visible.
  */
 
-function toggleCompletedTimerContainerVisibility(isVisible:boolean) {
+function toggleCompletedTimerContainerVisibility(isVisible: boolean) {
     const completedTimerContainerElem = document.getElementById(COMPLETED_TIMER_CONTAINER_ID)
     toggleElementVisibility(isVisible, completedTimerContainerElem)
 }
@@ -287,7 +291,7 @@ export function getCurrentURL() {
  * @param {Array<string>} newCSSClasses - CSS classes to add.
  */
 
-export function greyOutBuyButtons(elemIds: string[] = [], endTime:string|number|Date, cssClassesToRemove: string[] = [], newCSSClasses: string[] = ['dull-buy-btn']) {
+export function greyOutBuyButtons(elemIds: string[] = [], endTime: string | number | Date, cssClassesToRemove: string[] = [], newCSSClasses: string[] = ['dull-buy-btn']) {
     elemIds.forEach(elemId => {
         changeBuyButtonStyling(elemId, endTime, cssClassesToRemove, newCSSClasses)
     });
@@ -300,7 +304,7 @@ export function greyOutBuyButtons(elemIds: string[] = [], endTime:string|number|
  * @param {Array<string>} cssClassesToRestore - CSS classes to restore.
  */
 
-function unGreyOutBuyButtons(elemIds:string[] = [], cssClassesToRemove:string[] = ['dull-buy-btn'], cssClassesToRestore:string[] = []) {
+function unGreyOutBuyButtons(elemIds: string[] = [], cssClassesToRemove: string[] = ['dull-buy-btn'], cssClassesToRestore: string[] = []) {
     elemIds.forEach(elemId => {
         revertBuyButtonStyling(elemId, cssClassesToRestore, cssClassesToRemove,)
     });
@@ -311,7 +315,7 @@ function unGreyOutBuyButtons(elemIds:string[] = [], cssClassesToRemove:string[] 
  * @param {number|string|Date} storedTime - The target time for the countdown.
  * @param {boolean} showSeconds - Whether to show seconds in the countdown.
  */
-function startCtaBtnCountdownTimer(storedTime:number|string|Date, showSeconds = false) {
+function startCtaBtnCountdownTimer(storedTime: number | string | Date, showSeconds = false) {
     createCountdownTimer(storedTime, CS_CTA_BTN_ID, '', showSeconds)
 }
 /**
@@ -323,7 +327,8 @@ function startCtaBtnCountdownTimer(storedTime:number|string|Date, showSeconds = 
 
 export function updatePageDOMIfTimerExists(buyButtonElemIds: string[] = [], cssClassesToRemove: string[] = []) {
     getStoredTime(getCurrentURL()).then((storedTime) => {
-        if (storedTime !== undefined && storedTime !== null) {
+        storedTime = storedTime as string | undefined;
+        if (storedTime !== undefined && storedTime !== null && typeof (storedTime) == "string" && new Date(storedTime).getTime() > Date.now()) {
             updatePageDOMWithTimerInterventions(buyButtonElemIds, cssClassesToRemove, String(storedTime))
         }
     })
@@ -336,9 +341,9 @@ export function updatePageDOMIfTimerExists(buyButtonElemIds: string[] = [], cssC
  * @param {number} endTime - The timestamp when the timer ends.
  */
 
-export function updatePageDOMWithTimerInterventions(buyButtonElemIds: string[] = [], cssClassesToRemove: string[] = [], endTime: string|number|Date) {
+export function updatePageDOMWithTimerInterventions(buyButtonElemIds: string[] = [], cssClassesToRemove: string[] = [], endTime: string | number | Date) {
     greyOutBuyButtons(buyButtonElemIds, endTime, cssClassesToRemove)
-    startCtaBtnCountdownTimer(endTime)
+    startCtaBtnCountdownTimer(endTime, true)
 }
 /**
  * Clears the existing countdown timer interval.
@@ -353,9 +358,10 @@ export function removeExistingTimerInterval() {
  * @param {Array<string>} cssClassesToRemove - CSS classes to remove from the buttons.
  * @param {Array<string>} cssClassesToRestore - CSS classes to restore on the buttons.
  */
-export function removeTimerFromPage(buyButtonElemIds:string[] = [], cssClassesToRemove:string[] = ['dull-buy-btn'], cssClassesToRestore:string[] = []) {
-    clearInterval(intervalId)
-    unGreyOutBuyButtons(buyButtonElemIds, cssClassesToRemove, cssClassesToRestore)
+export function removeTimerFromPage(buyButtonElemIds: string[] = [], cssClassesToRemove: string[] = ['dull-buy-btn'], cssClassesToRestore: string[] = []) {
+    clearInterval(CTAIntervalId);
+    unGreyOutBuyButtons(buyButtonElemIds, cssClassesToRemove, cssClassesToRestore);
+    addStartTimerTextToCTAButton();
 }
 /**
  * Opens the extension's options page.
@@ -408,7 +414,6 @@ function checkIfFeedbackIsProvided() {
         }).then((url) => {
             return Promise.all([getStoredTime(url), getStoredPurchases()])
                 .then((values) => {
-                    console.log(values);
                     const storedTime: string = values[0] as string;
                     const storedFeedback = values[1].deferred.concat(values[1].completed);
 
@@ -417,7 +422,6 @@ function checkIfFeedbackIsProvided() {
                     const feedbackEntry = storedFeedback.find((entry: { url: any; timerEndTime: string | number | Date; }) => ((entry?.url === url) || entry == url) && (!entry?.timerEndTime || new Date(storedTime).getTime() == new Date(entry.timerEndTime).getTime()));
 
                     if (!feedbackEntry) {
-                        console.log("No feedback provided for this URL.");
                         return false;
                     } else {
                         return true
@@ -439,6 +443,7 @@ export function handleTimerDisabled() {
         addTimerBtn.classList.add('dull-buy-btn');
         (addTimerBtn as HTMLButtonElement).disabled = true
         addTimerBtn.title = "Timer is disabled. Visit the options page to enable it."
+        //TODO: Add message below button informing user the intervention is disabled
     }
 }
 /**
@@ -461,9 +466,7 @@ export function handleTimerEnabled(timerDuration: any) {
 export function checkActiveInterventions() {
     chrome.storage.local.get({ timer: true, timerDuration: 24 }).then(
         (items) => {
-            console.log(items)
             if (items.timer === false) {
-                console.log("changing the information for the user")
                 //TODO: Add message informing user the intervention is disabled
                 handleTimerDisabled()
             } else {
@@ -476,7 +479,7 @@ export function getProductPriceFromPage() {
     return chrome.tabs.query({ currentWindow: true, active: true }).then((tabs) => {
         var activeTab = tabs[0];
         if (activeTab.id !== undefined) {
-            return chrome.tabs.sendMessage(activeTab.id, { action: "get-product-price" }).then((price) => price, () => 0);
+            return chrome.tabs.sendMessage(activeTab.id, { action: GET_PRODUCT_PRICE_ACTION }).then((price) => price, () => 0);
         } else {
             return Promise.resolve(0);
         }
@@ -505,8 +508,20 @@ export function setTimeUsingBackgroundProcess(action = 'set-timer', url: any, pr
     return chrome.runtime.sendMessage({ action: action, url: url, initiator: 'popup', price: price });
 }
 
+export function extractProductPriceFromAmazonPage() {
+    const priceInputElement = document.getElementById(AMZN_PRICE_INPUT_FIELD_ID)
+    return priceInputElement ? (priceInputElement as HTMLInputElement).value : 0;
+}
+export function addStartTimerTextToCTAButton() {
+    const ctaBtn = document.getElementById(CS_CTA_BTN_ID);
+    if (ctaBtn !== null) {
+        ctaBtn.innerText = CTA_BUTTON_TEXT;
+        ctaBtn.setAttribute("data-has-timer", 'false');
+    }
+}
 export type StoredInfo = {
     url: string;
-    timerEndTime: string;
+    time: string;
     price: string;
 }
+

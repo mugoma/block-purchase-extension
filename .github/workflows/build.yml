@@ -1,0 +1,34 @@
+name: Build and Check for Changes
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run build
+        run: npm run build:chrome-store
+
+      - name: Check for uncommitted changes in block-purchase-extension-chrome-store-version/
+        run: |
+          git add block-purchase-extension-chrome-store-version
+          if ! git diff --cached --exit-code; then
+            echo "Build directory has uncommitted changes! Ensure 'npm run build:chrome-store' is run and committed."
+            exit 1
+          fi
