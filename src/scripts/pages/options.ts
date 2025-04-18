@@ -1,6 +1,12 @@
+import { REFLECTION_STORAGE_KEY } from "../constants";
 import { addNavbarEventListeners } from "./navbar";
-
 addNavbarEventListeners()
+type UserOptions = {
+    timer: boolean,
+    reviews: boolean,
+    timerDuration: string | number,
+    reflection: boolean
+}
 /**
  * Saves the options for the timer and reviews settings to Chrome's local storage.
  * Updates the user interface to indicate that the options were successfully saved.
@@ -14,9 +20,11 @@ export const saveOptions = () => {
     const timerDuration = timerDurationElement ? timerDurationElement.value : '';
     const reviewsElement = document.getElementById('reviews') as HTMLInputElement;
     const reviews = reviewsElement ? reviewsElement.checked : false;
-
+    const reflectionElement = document.getElementById('reflection') as HTMLInputElement;
+    const reflection = reflectionElement ? reflectionElement.checked : false;
     // Save the options to Chrome's local storage
-    chrome.storage.local.set({ timer: timer, reviews: reviews, timerDuration: timerDuration }).then(
+    const options: UserOptions = { timer: timer, reviews: reviews, timerDuration: timerDuration, reflection: reflection }
+    chrome.storage.local.set(options).then(
         () => {
             // Notify the user that the options were saved
             const status = document.getElementById('status');
@@ -37,7 +45,8 @@ export const saveOptions = () => {
  */
 export const restoreOptions = () => {
     // Get the stored options from Chrome's local storage (default to true if not set)
-    chrome.storage.local.get({ timer: true, reviews: true, timerDuration: 24 }).then(
+    const defaultOptions: UserOptions = { timer: true, reviews: true, timerDuration: 24, reflection: true }
+    chrome.storage.local.get(defaultOptions).then(
         (items) => {
             const timerCheckbox = document.getElementById('timer') as HTMLInputElement;
             if (timerCheckbox) {
@@ -51,6 +60,11 @@ export const restoreOptions = () => {
             if (timerDurationInput) {
                 timerDurationInput.value = items?.timerDuration;
                 timerDurationInput.disabled = !items.timer;
+            }
+            const reflectionCheckbox = document.getElementById('reflection') as HTMLInputElement;
+            if (reflectionCheckbox) {
+                console.log(items[REFLECTION_STORAGE_KEY])
+                reflectionCheckbox.checked = items[REFLECTION_STORAGE_KEY]
             }
         }
     );

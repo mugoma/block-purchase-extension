@@ -373,12 +373,18 @@ export function openOptionsPage() {
         openPage("options.html");
     }
 }
+export function getExtensionPageURL(pageRelativePath: string){
+    return chrome.runtime.getURL('../pages/' + pageRelativePath)
+}
+export function getExtensionPageURL2(pageRelativePath: string){
+    return chrome.runtime.getURL('pages/' + pageRelativePath)
+}
 /**
  * Open one of the pages in the 'pages' directory. 
  * @param {string} pageRelativePath -Relative page path with file extension. 
  */
 export function openPage(pageRelativePath: string) {
-    window.open(chrome.runtime.getURL('../pages/' + pageRelativePath));
+    window.open(getExtensionPageURL(pageRelativePath));
 }
 /**
  * Handles the submission of post-feedback, toggling visibility of relevant sections.

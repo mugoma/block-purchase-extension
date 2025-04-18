@@ -1,5 +1,6 @@
-import { AMZN_PREV_ELEM_ID, AMZN_BUY_BTNS_IDS, AMZN_STAR_RATING_DIV_ID, AMZN_REVIEWS_DIV_ID, SET_TIMER_ACTION } from "../constants";
-import { addStartTimerTextToCTAButton, createInPageCTAElement, CS_CTA_BTN_ID, extractProductPriceFromAmazonPage, getCurrentURL, updatePageDOMIfTimerExists, updatePageDOMWithTimerInterventions } from "../utils";
+import { AMZN_PREV_ELEM_ID, AMZN_BUY_BTNS_IDS, AMZN_STAR_RATING_DIV_ID, AMZN_REVIEWS_DIV_ID, SET_TIMER_ACTION, AMZN_ADD_TO_CART_BNT_ELEM_ID, REDIRECT_ACTION, SOURCE_URL_PARAM, REFLECTION_STORAGE_KEY } from "../constants";
+import { getReflectionStorageKey } from "../pages/reflect";
+import { addStartTimerTextToCTAButton, createInPageCTAElement, CS_CTA_BTN_ID, extractProductPriceFromAmazonPage, getCurrentURL, getExtensionPageURL, getExtensionPageURL2, updatePageDOMIfTimerExists, updatePageDOMWithTimerInterventions } from "../utils";
 import { listenForMessages } from "./messageListener";
 
 /**
@@ -105,7 +106,6 @@ function addOverlayToReviews() {
  * Adds reduced social influence by overlaying the reviews if the feature is enabled in storage.
  */
 function addReducedSocialInfluence() {
-    //document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.get({ reviews: true }).then(
         (items) => {
             if (items.reviews == true) {
@@ -113,9 +113,45 @@ function addReducedSocialInfluence() {
             }
         }
     );
-    //})
+}
+function addReflection() {
+    const storageKey: { [key: string]: boolean } = {}
+    storageKey[REFLECTION_STORAGE_KEY] = true
+    chrome.storage.local.get(storageKey).then(
+        (items) => {
+            if (items[REFLECTION_STORAGE_KEY] == true) {
+                const questionnaire_responses_storage_key = getReflectionStorageKey(getCurrentURL())
+                chrome.storage.local.get(getReflectionStorageKey(getCurrentURL())).then((items) => {
+                    if (questionnaire_responses_storage_key) {
+                        if (!items[questionnaire_responses_storage_key]) {
+                            addReflectionEventListener();
+                        }
+                    }
+                })
+
+            }
+        }
+    );
 }
 
+function redirectToReflectionPage() {
+    // window.location.href  =getExtensionPageURL2("reflect.html")
+    // chrome.tabs.update(((undefined as unknown) as number), {url:getExtensionPageURL2("reflect.html")})
+    // location.replace(getExtensionPageURL2('reflect.html') + '?final_path=' + getCurrentURL())
+    chrome.runtime.sendMessage({ action: REDIRECT_ACTION, url: getExtensionPageURL2("reflect.html") + '?' + SOURCE_URL_PARAM + '=' + getCurrentURL() })
+}
+function addReflectionEventListener() {
+
+    Array.from(AMZN_BUY_BTNS_IDS).forEach(elementID => {
+        // Array.from(document.getElementById(elementID)).forEach(element => {
+        document.getElementById(elementID)?.addEventListener("click", (e: Event) => {
+            e.preventDefault()
+            redirectToReflectionPage();
+
+        })
+    })
+    // })
+}
 
 
 function executeDOMContentLoaded() {
@@ -132,6 +168,7 @@ function executeDOMContentLoaded() {
     // Apply reduced social influence by overlaying reviews if applicable
     addReducedSocialInfluence();
 
+    addReflection();
 }
 
 if (document.readyState !== 'loading') {
@@ -139,7 +176,3 @@ if (document.readyState !== 'loading') {
 } else {
     document.addEventListener('DOMContentLoaded', executeDOMContentLoaded);
 }
-//TODO: Remove  unhelpful comments
-// document.addEventListener('DOMContentLoaded', () => {
-//     executeDOMContentLoaded();
-// });

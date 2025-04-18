@@ -1,6 +1,6 @@
 //  Should exported to CommonJS2 format.
-import { ADD_PURCHASE_TIMER_STAT_ACTION, DELETE_TIMER_ACTION, RESET_TIMER_ACTION, SET_TIMER_ACTION } from '../constants';
-import { checkForExistingTimer, getCurrentTabUrl, openOptionsPage, openPage, removeExistingTimerInterval, toggleAddTimerContainerVisibility, toggleExistingTimerContainerVisibility, updateDOMwithCountDown, handlePostFeedbackSubmission, RESET_TIMER_BTNS_CLASS, DELETE_TIMER_LINK_ID, PURCHASE_FEEDBACK_BTNS_CLASS, STATS_PAGE_LINK_CLASS, ADD_TIMER_BTN_ID, STATS_PAGE_NAME, checkActiveInterventions, getProductPriceFromPage, setTimeUsingBackgroundProcess, OPTIONS_PAGE_LINK_ID, getCurrentUrlFromActiveTab } from '../utils';
+import { ADD_PURCHASE_TIMER_STAT_ACTION, DELETE_TIMER_ACTION, REDIRECT_ACTION, REFLECTION_QUESTIONNAIRE_PAGE_LINK_CLASS, RESET_TIMER_ACTION, SET_TIMER_ACTION, SOURCE_URL_PARAM } from '../constants';
+import { checkForExistingTimer, getCurrentTabUrl, openOptionsPage, openPage, removeExistingTimerInterval, toggleAddTimerContainerVisibility, toggleExistingTimerContainerVisibility, updateDOMwithCountDown, handlePostFeedbackSubmission, RESET_TIMER_BTNS_CLASS, DELETE_TIMER_LINK_ID, PURCHASE_FEEDBACK_BTNS_CLASS, STATS_PAGE_LINK_CLASS, ADD_TIMER_BTN_ID, STATS_PAGE_NAME, checkActiveInterventions, getProductPriceFromPage, setTimeUsingBackgroundProcess, OPTIONS_PAGE_LINK_ID, getCurrentUrlFromActiveTab, getExtensionPageURL2, getCurrentURL } from '../utils';
 import { getUrlData } from '../utils_chrome_api';
 
 export function executeAddTimerButtonClicked() {
@@ -113,6 +113,15 @@ export function addOptionsPageLinkClickEventListener() {
         });
     }
 }
+export function addReflectionQuestionnairePageLinkClickEventListeners() {
+    Array.from(document.getElementsByClassName(REFLECTION_QUESTIONNAIRE_PAGE_LINK_CLASS)).forEach(element => {
+        element.addEventListener("click", () => {
+            getCurrentUrlFromActiveTab().then((url) => {
+                chrome.runtime.sendMessage({ action: REDIRECT_ACTION, url: getExtensionPageURL2("reflect.html") + '?' + SOURCE_URL_PARAM + '=' + url })
+            })
+        });
+    })
+}
 
 /**
  * Adds a click event listener to the "Statistics Page" link.
@@ -136,6 +145,7 @@ export function handleDOMLoad() {
     addOptionsPageLinkClickEventListener();
     addStatsPageLinkClickEventListener();
     addPurchaseFeedbackBtnClickEventListeners();
+    addReflectionQuestionnairePageLinkClickEventListeners()
 }
 // Run the `checkActiveInterventions` function when the DOM content is fully loaded
 document.addEventListener('DOMContentLoaded', handleDOMLoad);

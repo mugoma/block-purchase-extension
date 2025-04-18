@@ -16,8 +16,19 @@ export const RESET_TIMER_ACTION = 'reset-timer';    // Action to reset a timer
 export const DELETE_TIMER_ACTION = 'delete-timer';  // Action to delete a timer
 export const GET_PRODUCT_PRICE_ACTION = 'get-product-price';  // Action to delete a timer
 export const ADD_PURCHASE_TIMER_STAT_ACTION = 'add-purchase-stat';
+export const REDIRECT_ACTION = 'redirect';
 
 
 // Constants for Chrome storage keys
 export const DEFERRED_PURCHASES_STORE_KEY = "deferred_purchases";
 export const COMPLETED_PURCHASES_STORE_KEY = "completed_purchases";
+
+// Constants fro Reflection intervention
+export const SOURCE_URL_PARAM = "source";
+
+// Constants for options
+export const REFLECTION_STORAGE_KEY = "reflection";
+
+// HTML Elements Constants
+export const REFLECTION_QUESTIONNAIRE_PAGE_LINK_CLASS = "reflection-questionnaire-page-links";
+

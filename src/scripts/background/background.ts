@@ -1,5 +1,5 @@
 // Import utility functions from the utils_chrome_api module
-import { SET_TIMER_ACTION, RESET_TIMER_ACTION, DELETE_TIMER_ACTION, ADD_PURCHASE_TIMER_STAT_ACTION } from "../constants";
+import { SET_TIMER_ACTION, RESET_TIMER_ACTION, DELETE_TIMER_ACTION, ADD_PURCHASE_TIMER_STAT_ACTION, REDIRECT_ACTION } from "../constants";
 import { getOrSetTime, resetTimeInStorage, sendMessageToContentScript, recordPurchaseDeferment } from "../utils_chrome_api";
 // Message Actions (constants representing various actions that can be handled)
 /**
@@ -43,6 +43,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const price = message.price
         // Record the purchase deferment and respond once completed
         recordPurchaseDeferment(url, wasDeferred, timerEndTime, price).then(() => { sendResponse("Completed") })
+
+    } else if (message.action === REDIRECT_ACTION) {
+        const url = message.url
+        chrome.tabs.update(((undefined as unknown) as number), { url: url })
 
     }
     // Indicate that the response will be sent asynchronously
