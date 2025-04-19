@@ -33,7 +33,7 @@ exports[`Snapshot Test for options.html HTML structure matches the snapshot 1`] 
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="" id="timer">
                 <label class="form-check-label" for="timer">
-                    Reflection(Timer)
+                    Postponement(Timer)
                 </label>
                 <div id="timerHelpBlock" class="form-text">
                     Enable countdown timer.
@@ -59,6 +59,15 @@ exports[`Snapshot Test for options.html HTML structure matches the snapshot 1`] 
                 </label>
                 <div id="reviewsHelpBlock" class="form-text">
                     Add an overlay to the reviews section of a shopping site.
+                </div>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="reflection">
+                <label class="form-check-label" for="reflection">
+                    Reflection(Questionnaire)
+                </label>
+                <div id="reflectionHelpBlock" class="form-text">
+                    Fill in a questionnaire to enable the buy buttons.
                 </div>
             </div>
             <div id="status"></div>
